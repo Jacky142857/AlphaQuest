@@ -1,0 +1,395 @@
+/* frontend/src/App.css */
+.App {
+  text-align: center;
+  background-color: #1a1a2e;
+  color: white;
+  min-height: 100vh;
+  font-family: 'Arial', sans-serif;
+}
+
+.app-header {
+  background-color: #0f0f23;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.app-header h1 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+.upload-section {
+  padding: 20px;
+  background-color: #16213e;
+  border-bottom: 1px solid #2a3b5c;
+}
+
+.main-content {
+  display: flex;
+  height: calc(100vh - 140px);
+}
+
+.left-panel {
+  width: 50%;
+  background-color: #0f0f23;
+  border-right: 1px solid #2a3b5c;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.right-panel {
+  width: 50%;
+  background-color: #1a1a2e;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+/* Upload Component Styles */
+.upload-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.upload-section {
+  background-color: #0f0f23;
+  border: 1px solid #2a3b5c;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.upload-section h4 {
+  margin-top: 0;
+  color: #ffffff;
+  font-size: 16px;
+}
+
+.dow30-button {
+  background-color: #28a745 !important;
+}
+
+.dow30-button:hover {
+  background-color: #218838 !important;
+}
+
+.dow30-button:disabled {
+  background-color: #1e7e34 !important;
+}
+
+/* Date Range Picker Styles */
+.date-range-section {
+  background-color: #16213e;
+  border: 1px solid #2a3b5c;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.date-inputs {
+  display: flex;
+  gap: 20px;
+  margin-top: 15px;
+}
+
+.date-inputs label {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: 14px;
+  color: #cccccc;
+}
+
+.date-inputs input[type="date"] {
+  padding: 8px 12px;
+  border: 1px solid #2a3b5c;
+  border-radius: 4px;
+  background-color: #0f0f23;
+  color: white;
+  font-size: 14px;
+}
+
+.date-inputs input[type="date"]:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+/* Original upload styles */
+.upload-container {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.upload-area {
+  border: 2px dashed #4a90e2;
+  border-radius: 8px;
+  padding: 40px 20px;
+  background-color: rgba(74, 144, 226, 0.1);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.upload-area:hover {
+  background-color: rgba(74, 144, 226, 0.2);
+  border-color: #5ba0f2;
+}
+
+.upload-area.dragover {
+  background-color: rgba(74, 144, 226, 0.3);
+  border-color: #5ba0f2;
+}
+
+.upload-icon {
+  font-size: 48px;
+  color: #4a90e2;
+  margin-bottom: 16px;
+}
+
+.upload-text {
+  color: #b0b0b0;
+  margin-bottom: 16px;
+}
+
+.file-input {
+  display: none;
+}
+
+.upload-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.upload-button:hover {
+  background-color: #357abd;
+}
+
+.upload-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.success-message {
+  color: #4caf50;
+  margin-top: 16px;
+  padding: 12px;
+  background-color: rgba(76, 175, 80, 0.1);
+  border-radius: 6px;
+}
+
+.error-message {
+  color: #f44336;
+  margin-top: 16px;
+  padding: 12px;
+  background-color: rgba(244, 67, 54, 0.1);
+  border-radius: 6px;
+}
+
+/* Alpha Formula Component Styles */
+.alpha-formula-container {
+  text-align: left;
+}
+
+.alpha-formula-container h2 {
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.formula-input {
+  width: 100%;
+  height: 200px;
+  background-color: #2a3b5c;
+  border: 1px solid #4a5568;
+  border-radius: 6px;
+  color: white;
+  padding: 16px;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  resize: vertical;
+  box-sizing: border-box;
+}
+
+.formula-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
+}
+
+.formula-input::placeholder {
+  color: #888;
+}
+
+.submit-button {
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 16px;
+  transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+  background-color: #357abd;
+}
+
+.submit-button:disabled {
+  background-color: #666;
+  cursor: not-allowed;
+}
+
+.formula-examples {
+  margin-top: 20px;
+  padding: 16px;
+  background-color: #2a3b5c;
+  border-radius: 6px;
+}
+
+.formula-examples h3 {
+  color: #4a90e2;
+  margin-bottom: 12px;
+  font-size: 16px;
+}
+
+.formula-examples ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.formula-examples li {
+  color: #b0b0b0;
+  margin-bottom: 8px;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.formula-examples li:hover {
+  background-color: #3a4b6c;
+  color: #ffffff;
+}
+
+/* Chart Component Styles */
+.chart-container {
+  text-align: left;
+}
+
+.chart-container h2 {
+  color: #ffffff;
+  margin-bottom: 20px;
+  font-size: 20px;
+}
+
+.chart-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background-color: #2a3b5c;
+  border-radius: 8px;
+  color: #888;
+  font-size: 18px;
+}
+
+.chart-content {
+  background-color: #2a3b5c;
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.metrics-section {
+  margin-top: 20px;
+  padding: 20px;
+  background-color: #16213e;
+  border-radius: 8px;
+}
+
+.metrics-section h3 {
+  color: #4a90e2;
+  margin-bottom: 16px;
+  font-size: 18px;
+}
+
+.metric-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #2a3b5c;
+}
+
+.metric-item:last-child {
+  border-bottom: none;
+}
+
+.metric-label {
+  color: #b0b0b0;
+}
+
+.metric-value {
+  color: #ffffff;
+  font-weight: 600;
+}
+
+.metric-value.positive {
+  color: #4caf50;
+}
+
+.metric-value.negative {
+  color: #f44336;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  color: #4a90e2;
+  font-size: 18px;
+}
+
+.loading::after {
+  content: '';
+  width: 20px;
+  height: 20px;
+  border: 2px solid #4a90e2;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+  margin-left: 10px;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column;
+    height: auto;
+  }
+  
+  .left-panel, .right-panel {
+    width: 100%;
+  }
+  
+  .left-panel {
+    border-right: none;
+    border-bottom: 1px solid #2a3b5c;
+  }
+}
