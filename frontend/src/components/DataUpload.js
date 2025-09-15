@@ -1,14 +1,33 @@
 // frontend/src/components/DataUpload.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
-const DataUpload = ({ onDataUploaded }) => {
+const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
   const [dragOver, setDragOver] = useState(false);
   const [loadingDow30, setLoadingDow30] = useState(false);
   const [dateRange, setDateRange] = useState(null);
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onToggle();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onToggle]);
 
   const handleFileSelect = (selectedFile) => {
     if (selectedFile && selectedFile.type === 'text/csv') {
@@ -117,12 +136,23 @@ const DataUpload = ({ onDataUploaded }) => {
   };
 
   return (
-    <div className="upload-container">
-      <h3>Data Source Options</h3>
+    <>
+      <button className="data-upload-toggle-btn" onClick={onToggle}>
+        📁 Data Upload
+      </button>
 
-      {/* Single File Upload */}
-      <div className="upload-section">
-        <h4>Upload Single CSV File</h4>
+      {isOpen && (
+        <div className="data-upload-overlay" onClick={onToggle}>
+          <div className="data-upload-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="data-upload-header">
+              <h3>Data Source Options</h3>
+              <button className="data-upload-close-btn" onClick={onToggle}>×</button>
+            </div>
+
+            <div className="data-upload-content">
+        {/* Single File Upload */}
+        <div className="upload-section">
+          <h4>Upload Single CSV File</h4>
         <div
           className={`upload-area ${dragOver ? 'dragover' : ''}`}
           onDrop={handleDrop}
@@ -213,12 +243,16 @@ const DataUpload = ({ onDataUploaded }) => {
         </div>
       )}
 
-      {uploadStatus && (
-        <div className={uploadStatus.type === 'success' ? 'success-message' : 'error-message'}>
-          {uploadStatus.message}
+              {uploadStatus && (
+                <div className={uploadStatus.type === 'success' ? 'success-message' : 'error-message'}>
+                  {uploadStatus.message}
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       )}
-    </div>
+    </>
   );
 };
 

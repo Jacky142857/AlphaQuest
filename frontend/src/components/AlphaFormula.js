@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 
-const AlphaFormula = ({ onResult, isDataUploaded, setLoading }) => {
+const AlphaFormula = ({ onResult, isDataUploaded, setLoading, strategySettings }) => {
   const [formula, setFormula] = useState('');
   const [error, setError] = useState(null);
 
@@ -34,7 +34,8 @@ const AlphaFormula = ({ onResult, isDataUploaded, setLoading }) => {
 
     try {
       const response = await axios.post('/api/calculate-alpha/', {
-        alpha_formula: formula
+        alpha_formula: formula,
+        settings: strategySettings
       });
 
       onResult(response.data);

@@ -15,6 +15,22 @@ stored_data = None
 stored_multi_data = None
 available_date_range = None
 
+# Global strategy settings
+strategy_settings = {
+    'neutralization': 'Subindustry',
+    'decay': 4,
+    'truncation': 0.08,
+    'pasteurization': 'On',
+    'nanHandling': 'Off',
+    'maxTrade': 'Off',
+    'delay': 1,
+    'commission': 0.001,
+    'bookSize': 1000000,
+    'minWeight': 0.01,
+    'maxWeight': 0.05,
+    'rebalanceFreq': 'Daily'
+}
+
 @csrf_exempt
 @api_view(['POST'])
 def upload_data(request):
@@ -184,8 +200,38 @@ def set_date_range(request):
 
 @csrf_exempt
 @api_view(['POST'])
+def update_settings(request):
+    global strategy_settings
+
+    try:
+        data = json.loads(request.body)
+
+        # Update strategy settings
+        for key, value in data.items():
+            if key in strategy_settings:
+                strategy_settings[key] = value
+
+        return Response({
+            'message': 'Settings updated successfully',
+            'settings': strategy_settings
+        })
+
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['GET'])
+def get_settings(request):
+    global strategy_settings
+
+    return Response({
+        'settings': strategy_settings
+    })
+
+@csrf_exempt
+@api_view(['POST'])
 def calculate_alpha(request):
-    global stored_data, stored_multi_data
+    global stored_data, stored_multi_data, strategy_settings
 
     if stored_data is None and stored_multi_data is None:
         return Response({'error': 'No data uploaded'}, status=status.HTTP_400_BAD_REQUEST)
@@ -200,17 +246,17 @@ def calculate_alpha(request):
         # Calculate alpha and metrics
         if stored_multi_data:
             # Multi-stock mode
-            result = process_alpha_strategy_multi(stored_multi_data, alpha_formula)
+            result = process_alpha_strategy_multi(stored_multi_data, alpha_formula, strategy_settings)
         else:
             # Single stock mode
-            result = process_alpha_strategy(stored_data, alpha_formula)
+            result = process_alpha_strategy(stored_data, alpha_formula, strategy_settings)
 
         return Response(result)
 
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-def process_alpha_strategy(df, alpha_formula_str):
+def process_alpha_strategy(df, alpha_formula_str, settings):
     """Process the alpha strategy based on the uploaded data and formula"""
     
     # Define symbolic variables
@@ -395,10 +441,10 @@ def process_alpha_strategy(df, alpha_formula_str):
     except Exception as e:
         raise Exception(f"Error evaluating alpha formula: {str(e)}")
     
-    # Apply strategy parameters
-    Truncation = 0
-    Decay = 1
-    Delay = 1
+    # Apply strategy parameters from settings
+    Truncation = settings.get('truncation', 0)
+    Decay = settings.get('decay', 1)
+    Delay = settings.get('delay', 1)
     
     # Handle single series vs DataFrame vs numpy array
     print(f"df_alpha type before processing: {type(df_alpha)}")
@@ -415,7 +461,7 @@ def process_alpha_strategy(df, alpha_formula_str):
         print(f"alpha_final type: {type(alpha_final)}")
 
         # Calculate returns
-        returns = np.log(Close / Close.shift(1))
+        returns = Close.pct_change()
         returns = returns.loc[alpha_final.index]
 
         # Calculate strategy returns (normalize alpha to create position)
@@ -437,20 +483,20 @@ def process_alpha_strategy(df, alpha_formula_str):
         
         alpha_decayed = normalized_weight.rolling(window=Decay).apply(weighted_moving_average, raw=True)
         alpha_final = alpha_decayed.shift(Delay)
-        
-        returns = np.log(Close / Close.shift(1))
+
+        returns = Close.pct_change()
         returns = returns.loc[alpha_final.index]
         
         strategy_returns = (alpha_final * returns).sum(axis=1)
     
     # Remove NaN values
     strategy_returns = strategy_returns.dropna()
-    
+
     if len(strategy_returns) == 0:
         raise Exception("No valid returns calculated")
-    
-    # Calculate cumulative returns
-    cumulative_returns = strategy_returns.cumsum().apply(np.exp)
+
+    # Calculate cumulative returns using arithmetic compounding
+    cumulative_returns = (1 + strategy_returns).cumprod()
     
     # Calculate metrics
     total_return = cumulative_returns.iloc[-1] - 1
@@ -475,7 +521,7 @@ def process_alpha_strategy(df, alpha_formula_str):
         }
     }
 
-def process_alpha_strategy_multi(multi_stock_data, alpha_formula_str):
+def process_alpha_strategy_multi(multi_stock_data, alpha_formula_str, settings):
     """Process the alpha strategy based on multiple stock data and formula"""
 
     # Get all stock symbols
@@ -615,10 +661,54 @@ def process_alpha_strategy_multi(multi_stock_data, alpha_formula_str):
 
     print(f"Multi-stock df_alpha shape: {df_alpha.shape}")
 
-    # Apply strategy parameters
-    Truncation = 0.01  # Small truncation for outliers
-    Decay = 1
-    Delay = 1
+    # Special case: if alpha is all 1s, use pure equal weighting like equal_weighted_dj30.py
+    if isinstance(df_alpha, pd.DataFrame) and ((df_alpha == 1).all().all()):
+        print("Alpha is all 1s - using pure equal weighting to match equal_weighted_dj30.py")
+
+        # Calculate returns for all stocks
+        returns = close_data.pct_change().dropna()
+
+        # Equal weighted portfolio return (simple average)
+        strategy_returns = returns.mean(axis=1)
+
+        # Remove NaN values
+        strategy_returns = strategy_returns.dropna()
+
+        if len(strategy_returns) == 0:
+            raise Exception("No valid returns calculated")
+
+        # Calculate cumulative returns using arithmetic compounding (matches equal_weighted_dj30.py)
+        cumulative_returns = (1 + strategy_returns).cumprod()
+
+        # Calculate metrics
+        total_return = cumulative_returns.iloc[-1] - 1
+
+        # Prepare data for frontend
+        if hasattr(strategy_returns.index, 'strftime'):
+            dates = strategy_returns.index.strftime('%Y-%m-%d').tolist()
+        else:
+            dates = [str(idx) for idx in strategy_returns.index.tolist()]
+        pnl_values = cumulative_returns.tolist()
+
+        return {
+            'success': True,
+            'pnl_data': {
+                'dates': dates,
+                'values': pnl_values
+            },
+            'metrics': {
+                'total_return': float(total_return),
+                'total_return_pct': f"{total_return * 100:.2f}%",
+                'stocks_count': len(close_data.columns),
+                'date_range': f"{dates[0]} to {dates[-1]}",
+                'method': 'Pure equal weighting (alpha=1)'
+            }
+        }
+
+    # Apply strategy parameters from settings
+    Truncation = settings.get('truncation', 0.01)  # Small truncation for outliers
+    Decay = settings.get('decay', 1)
+    Delay = settings.get('delay', 1)
 
     # For multi-stock, we already have cross-sectional data
     if isinstance(df_alpha, pd.DataFrame):
@@ -646,7 +736,7 @@ def process_alpha_strategy_multi(multi_stock_data, alpha_formula_str):
         alpha_final = alpha_decayed.shift(Delay)
 
         # Calculate returns for all stocks
-        returns = np.log(close_data / close_data.shift(1))
+        returns = close_data.pct_change()
         returns = returns.loc[alpha_final.index]
 
         # Calculate strategy returns (portfolio return)
@@ -656,7 +746,7 @@ def process_alpha_strategy_multi(multi_stock_data, alpha_formula_str):
         # Single series case (shouldn't happen in multi-stock mode, but handle it)
         df_alpha = pd.Series(df_alpha, index=common_dates)
         alpha_final = df_alpha.shift(Delay)
-        returns = np.log(close_data.iloc[:, 0] / close_data.iloc[:, 0].shift(1))
+        returns = close_data.iloc[:, 0].pct_change()
         strategy_returns = alpha_final * returns
 
     # Remove NaN values
@@ -665,8 +755,8 @@ def process_alpha_strategy_multi(multi_stock_data, alpha_formula_str):
     if len(strategy_returns) == 0:
         raise Exception("No valid returns calculated")
 
-    # Calculate cumulative returns
-    cumulative_returns = strategy_returns.cumsum().apply(np.exp)
+    # Calculate cumulative returns using arithmetic compounding
+    cumulative_returns = (1 + strategy_returns).cumprod()
 
     # Calculate metrics
     total_return = cumulative_returns.iloc[-1] - 1

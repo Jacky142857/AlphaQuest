@@ -1,55 +1,29 @@
 // frontend/src/App.js
-import React, { useState } from 'react';
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider } from './contexts/ThemeContext';
 import './App.css';
-import AlphaFormula from './components/AlphaFormula';
-import PnLChart from './components/PnLChart';
-import DataUpload from './components/DataUpload';
+import Navigation from './components/Navigation';
+import Simulate from './components/Simulate';
+import Learn from './components/Learn';
 
 function App() {
-  const [pnlData, setPnlData] = useState(null);
-  const [metrics, setMetrics] = useState(null);
-  const [isDataUploaded, setIsDataUploaded] = useState(false);
-  const [loading, setLoading] = useState(false);
-
-  const handleDataUpload = () => {
-    setIsDataUploaded(true);
-    setPnlData(null);
-    setMetrics(null);
-  };
-
-  const handleAlphaResult = (result) => {
-    setPnlData(result.pnl_data);
-    setMetrics(result.metrics);
-  };
-
   return (
-    <div className="App">
-      <header className="app-header">
-        <h1>Trading Signals Alpha Strategy</h1>
-      </header>
-      
-      <div className="upload-section">
-        <DataUpload onDataUploaded={handleDataUpload} />
-      </div>
+    <ThemeProvider>
+      <Router>
+        <div className="App">
+          <Navigation />
 
-      <div className="main-content">
-        <div className="left-panel">
-          <AlphaFormula 
-            onResult={handleAlphaResult}
-            isDataUploaded={isDataUploaded}
-            setLoading={setLoading}
-          />
+          <div className="app-content">
+            <Routes>
+              <Route path="/" element={<Navigate to="/simulate" replace />} />
+              <Route path="/simulate" element={<Simulate />} />
+              <Route path="/learn/*" element={<Learn />} />
+            </Routes>
+          </div>
         </div>
-        
-        <div className="right-panel">
-          <PnLChart 
-            data={pnlData} 
-            metrics={metrics}
-            loading={loading}
-          />
-        </div>
-      </div>
-    </div>
+      </Router>
+    </ThemeProvider>
   );
 }
 

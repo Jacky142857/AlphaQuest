@@ -1,29 +1,26 @@
 /* frontend/src/App.css */
 .App {
   text-align: center;
-  background-color: #1a1a2e;
-  color: white;
+  background-color: #f8f9fa;
+  color: #333;
   min-height: 100vh;
   font-family: 'Arial', sans-serif;
 }
 
-.app-header {
-  background-color: #0f0f23;
-  padding: 20px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+.app-content {
+  min-height: calc(100vh - 80px); /* Adjust based on navigation height */
 }
 
-.app-header h1 {
-  margin: 0;
-  color: #ffffff;
-  font-size: 24px;
-  font-weight: 600;
+.simulate-container {
+  padding: 20px;
+  min-height: calc(100vh - 120px);
 }
 
 .upload-section {
   padding: 20px;
-  background-color: #16213e;
-  border-bottom: 1px solid #2a3b5c;
+  background-color: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .main-content {
@@ -33,15 +30,15 @@
 
 .left-panel {
   width: 50%;
-  background-color: #0f0f23;
-  border-right: 1px solid #2a3b5c;
+  background-color: #ffffff;
+  border-right: 1px solid #e0e0e0;
   padding: 20px;
   overflow-y: auto;
 }
 
 .right-panel {
   width: 50%;
-  background-color: #1a1a2e;
+  background-color: #f8f9fa;
   padding: 20px;
   overflow-y: auto;
 }
@@ -53,16 +50,17 @@
 }
 
 .upload-section {
-  background-color: #0f0f23;
-  border: 1px solid #2a3b5c;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
 .upload-section h4 {
   margin-top: 0;
-  color: #ffffff;
+  color: #333;
   font-size: 16px;
 }
 
@@ -197,7 +195,7 @@
 }
 
 .alpha-formula-container h2 {
-  color: #ffffff;
+  color: #333;
   margin-bottom: 20px;
   font-size: 20px;
 }
@@ -250,7 +248,8 @@
 .formula-examples {
   margin-top: 20px;
   padding: 16px;
-  background-color: #2a3b5c;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
   border-radius: 6px;
 }
 
@@ -267,7 +266,7 @@
 }
 
 .formula-examples li {
-  color: #b0b0b0;
+  color: #666;
   margin-bottom: 8px;
   font-family: 'Courier New', monospace;
   font-size: 13px;
@@ -278,8 +277,8 @@
 }
 
 .formula-examples li:hover {
-  background-color: #3a4b6c;
-  color: #ffffff;
+  background-color: #e9ecef;
+  color: #333;
 }
 
 /* Chart Component Styles */
@@ -288,7 +287,7 @@
 }
 
 .chart-container h2 {
-  color: #ffffff;
+  color: #333;
   margin-bottom: 20px;
   font-size: 20px;
 }
@@ -298,14 +297,16 @@
   align-items: center;
   justify-content: center;
   height: 400px;
-  background-color: #2a3b5c;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
-  color: #888;
+  color: #666;
   font-size: 18px;
 }
 
 .chart-content {
-  background-color: #2a3b5c;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 20px;
 }
@@ -313,7 +314,8 @@
 .metrics-section {
   margin-top: 20px;
   padding: 20px;
-  background-color: #16213e;
+  background-color: #f8f9fa;
+  border: 1px solid #e0e0e0;
   border-radius: 8px;
 }
 
@@ -327,7 +329,7 @@
   display: flex;
   justify-content: space-between;
   padding: 8px 0;
-  border-bottom: 1px solid #2a3b5c;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 .metric-item:last-child {
@@ -335,11 +337,11 @@
 }
 
 .metric-label {
-  color: #b0b0b0;
+  color: #666;
 }
 
 .metric-value {
-  color: #ffffff;
+  color: #333;
   font-weight: 600;
 }
 
@@ -377,6 +379,308 @@
   }
 }
 
+/* Data Upload Toggle Styles */
+.data-upload-toggle-btn {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 20px;
+  transition: background-color 0.2s;
+}
+
+.data-upload-toggle-btn:hover {
+  background: #357abd;
+}
+
+.data-upload-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.data-upload-modal {
+  background: #ffffff;
+  color: #333;
+  border-radius: 12px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+  max-width: 90vw;
+  max-height: 90vh;
+  width: 700px;
+  overflow-y: auto;
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.data-upload-header {
+  background: #f8f9fa;
+  padding: 20px 24px;
+  border-radius: 12px 12px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #e0e0e0;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.data-upload-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.data-upload-close-btn {
+  background: #f0f0f0;
+  border: none;
+  color: #666;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 6px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s;
+}
+
+.data-upload-close-btn:hover {
+  background: #e0e0e0;
+  color: #333;
+  transform: scale(1.05);
+}
+
+.data-upload-content {
+  padding: 24px;
+  max-height: calc(90vh - 100px);
+  overflow-y: auto;
+}
+
+/* Panel Controls */
+.panel-controls {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+/* Dark Theme Styles */
+.dark-theme {
+  background-color: #1a1a2e;
+  color: white;
+}
+
+.dark-theme .App {
+  background-color: #1a1a2e;
+  color: white;
+}
+
+.dark-theme .simulate-container {
+  background-color: #1a1a2e;
+}
+
+.dark-theme .left-panel {
+  background-color: #0f0f23;
+  border-right-color: #2a3b5c;
+}
+
+.dark-theme .right-panel {
+  background-color: #1a1a2e;
+}
+
+.dark-theme .upload-section {
+  background-color: #16213e;
+  border-color: #2a3b5c;
+}
+
+.dark-theme .upload-section h4 {
+  color: #ffffff;
+}
+
+.dark-theme .date-inputs label {
+  color: #cccccc;
+}
+
+.dark-theme .date-inputs input[type="date"] {
+  background-color: #0f0f23;
+  border-color: #2a3b5c;
+  color: white;
+}
+
+.dark-theme .alpha-formula-container h2 {
+  color: #ffffff;
+}
+
+.dark-theme .formula-examples {
+  background-color: #2a3b5c;
+  border-color: #4a5568;
+}
+
+.dark-theme .formula-examples li {
+  color: #b0b0b0;
+}
+
+.dark-theme .formula-examples li:hover {
+  background-color: #3a4b6c;
+  color: #ffffff;
+}
+
+.dark-theme .chart-container h2 {
+  color: #ffffff;
+}
+
+.dark-theme .chart-placeholder {
+  background-color: #2a3b5c;
+  border-color: #4a5568;
+  color: #888;
+}
+
+.dark-theme .chart-content {
+  background-color: #2a3b5c;
+  border-color: #4a5568;
+}
+
+.dark-theme .metrics-section {
+  background-color: #16213e;
+  border-color: #2a3b5c;
+}
+
+.dark-theme .metric-item {
+  border-bottom-color: #2a3b5c;
+}
+
+.dark-theme .metric-label {
+  color: #b0b0b0;
+}
+
+.dark-theme .metric-value {
+  color: #ffffff;
+}
+
+.dark-theme .data-upload-overlay {
+  background: rgba(0, 0, 0, 0.7);
+}
+
+.dark-theme .data-upload-modal {
+  background: #2b2d42;
+  color: white;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+}
+
+.dark-theme .data-upload-header {
+  background: #1a1c2e;
+  border-bottom-color: #404258;
+}
+
+.dark-theme .data-upload-header h3 {
+  color: white;
+}
+
+.dark-theme .data-upload-close-btn {
+  background: #404258;
+  color: #aaa;
+}
+
+.dark-theme .data-upload-close-btn:hover {
+  background: #4a5568;
+  color: white;
+}
+
+.dark-theme .upload-area {
+  border-color: #4a90e2;
+  background-color: rgba(74, 144, 226, 0.1);
+}
+
+.dark-theme .upload-area:hover {
+  background-color: rgba(74, 144, 226, 0.2);
+}
+
+.dark-theme .upload-area.dragover {
+  background-color: rgba(74, 144, 226, 0.3);
+}
+
+.dark-theme .upload-text {
+  color: #b0b0b0;
+}
+
+/* Learn Component Dark Theme */
+.dark-theme .learn-container {
+  background: #1a1c2e;
+  color: white;
+}
+
+.dark-theme .learn-content {
+  background: #2b2d42;
+}
+
+/* Settings Component Dark Theme */
+.dark-theme .settings-toggle-btn {
+  background: #4a90e2;
+}
+
+.dark-theme .settings-panel {
+  background: #2b2d42;
+  color: white;
+}
+
+.dark-theme .settings-header {
+  background: #1a1c2e;
+  border-bottom-color: #404258;
+}
+
+.dark-theme .settings-close-btn {
+  color: #aaa;
+}
+
+.dark-theme .settings-close-btn:hover {
+  color: white;
+}
+
+.dark-theme .setting-select {
+  background: #404258;
+  border-color: #555;
+  color: white;
+}
+
+.dark-theme .setting-select:focus {
+  border-color: #4a90e2;
+}
+
+.dark-theme .slider {
+  background: #404258;
+}
+
+.dark-theme .slider-value {
+  background: #404258;
+  color: white;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .main-content {
@@ -391,5 +695,29 @@
   .left-panel {
     border-right: none;
     border-bottom: 1px solid #2a3b5c;
+  }
+
+  .data-upload-modal {
+    width: 95vw;
+    max-height: 95vh;
+    margin: 10px;
+  }
+
+  .data-upload-header {
+    padding: 16px 20px;
+  }
+
+  .data-upload-content {
+    padding: 20px;
+  }
+
+  .panel-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .data-upload-toggle-btn {
+    width: 100%;
+    margin-bottom: 10px;
   }
 }

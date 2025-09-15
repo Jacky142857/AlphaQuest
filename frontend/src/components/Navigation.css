@@ -1,0 +1,169 @@
+/* Navigation.css */
+.main-navigation {
+  background: #ffffff;
+  border-bottom: 2px solid #e0e0e0;
+  padding: 0 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.nav-brand {
+  flex: 1;
+}
+
+.nav-brand a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.nav-brand h1 {
+  color: #4a90e2;
+  font-size: 1.5rem;
+  margin: 15px 0;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.nav-brand h1:hover {
+  color: #357abd;
+}
+
+.nav-links {
+  display: flex;
+  gap: 30px;
+  align-items: center;
+}
+
+.nav-link {
+  padding: 12px 20px;
+  text-decoration: none;
+  color: #666;
+  font-weight: 500;
+  font-size: 1rem;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: relative;
+}
+
+.nav-link:hover {
+  background: #f8f9fa;
+  color: #4a90e2;
+  transform: translateY(-1px);
+}
+
+.nav-link.active {
+  background: #4a90e2;
+  color: white;
+}
+
+.nav-link.active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 30px;
+  height: 3px;
+  background: #4a90e2;
+  border-radius: 2px;
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: none;
+  border: 2px solid #e0e0e0;
+  padding: 8px 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  margin-left: 10px;
+}
+
+.theme-toggle-btn:hover {
+  border-color: #4a90e2;
+  background: #f8f9fa;
+  transform: scale(1.05);
+}
+
+/* Dark theme styles for navigation */
+.dark-theme .main-navigation {
+  background: #1a1c2e;
+  border-bottom-color: #404258;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .nav-brand h1 {
+  color: #87ceeb;
+}
+
+.dark-theme .nav-brand h1:hover {
+  color: #4a90e2;
+}
+
+.dark-theme .nav-link {
+  color: #87ceeb;
+}
+
+.dark-theme .nav-link:hover {
+  background: #2b2d42;
+  color: #4a90e2;
+}
+
+.dark-theme .theme-toggle-btn {
+  border-color: #404258;
+  color: #87ceeb;
+}
+
+.dark-theme .theme-toggle-btn:hover {
+  border-color: #4a90e2;
+  background: #2b2d42;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .main-navigation {
+    flex-direction: column;
+    padding: 15px 20px;
+    gap: 15px;
+  }
+
+  .nav-brand {
+    flex: none;
+  }
+
+  .nav-brand h1 {
+    font-size: 1.3rem;
+    margin: 0;
+    text-align: center;
+  }
+
+  .nav-links {
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+  }
+
+  .nav-link {
+    padding: 10px 16px;
+    font-size: 0.9rem;
+  }
+
+  .theme-toggle-btn {
+    margin-left: 0;
+    margin-top: 10px;
+  }
+}
