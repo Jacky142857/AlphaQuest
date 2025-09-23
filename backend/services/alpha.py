@@ -210,7 +210,7 @@ def process_alpha_strategy(df: pd.DataFrame, alpha_formula_str: str, settings: d
 
     # Apply strategy parameters (with defaults)
     Truncation = settings.get('truncation', 0)
-    Decay = settings.get('decay', 1)
+    Decay = settings.get('decay', 0)  # Default 0 means no decay (use current values only)
     Delay = settings.get('delay', 1)
     Neutralization = settings.get('neutralization', False)
 
@@ -273,17 +273,23 @@ def process_alpha_strategy(df: pd.DataFrame, alpha_formula_str: str, settings: d
         equal_weight = 1.0 / alpha_truncated.shape[1]
         normalized_weight = normalized_weight.fillna(equal_weight)
 
-        # Apply decay (weighted moving average over the cross-sectional weights if decay>1)
-        def _wma(x):
-            n = len(x)
-            if n <= 0:
-                return 0
-            weights = np.arange(1, n + 1)
-            return np.sum(x * weights) / np.sum(weights)
+        # Apply decay (linear averaging over past X days to reduce turnover)
+        if Decay and Decay > 0:
+            # Decay = 0: no decay (use current values only)
+            # Decay = 1: average with 1 previous day
+            # Decay = 10: average with 10 previous days
+            window_size = int(Decay) + 1  # +1 to include current day
 
-        if Decay and Decay > 1:
-            alpha_decayed = normalized_weight.rolling(window=Decay, min_periods=1).apply(_wma, raw=True)
+            def _linear_decay(x):
+                """Linear decay: simple average over the window"""
+                n = len(x)
+                if n <= 0:
+                    return 0
+                return np.mean(x)  # Simple average for linear decay
+
+            alpha_decayed = normalized_weight.rolling(window=window_size, min_periods=1).apply(_linear_decay, raw=True)
         else:
+            # No decay: use current values only
             alpha_decayed = normalized_weight
 
         alpha_final = alpha_decayed.shift(Delay)
@@ -559,7 +565,7 @@ def process_alpha_strategy_multi(multi_stock_data: dict, alpha_formula_str: str,
 
     # Settings
     Truncation = settings.get('truncation', 0.01)
-    Decay = settings.get('decay', 1)
+    Decay = settings.get('decay', 0)  # Default 0 means no decay (use current values only)
     Delay = settings.get('delay', 1)
     Neutralization = settings.get('neutralization', False)
 
@@ -588,17 +594,23 @@ def process_alpha_strategy_multi(multi_stock_data: dict, alpha_formula_str: str,
         equal_weight = 1.0 / alpha_truncated.shape[1]
         normalized_weight = normalized_weight.fillna(equal_weight)
 
-        # Weighted moving average for decay
-        def _wma(x):
-            n = len(x)
-            if n <= 0:
-                return 0
-            weights = np.arange(1, n + 1)
-            return np.sum(x * weights) / np.sum(weights)
+        # Apply decay (linear averaging over past X days to reduce turnover)
+        if Decay and Decay > 0:
+            # Decay = 0: no decay (use current values only)
+            # Decay = 1: average with 1 previous day
+            # Decay = 10: average with 10 previous days
+            window_size = int(Decay) + 1  # +1 to include current day
 
-        if Decay and Decay > 1:
-            alpha_decayed = normalized_weight.rolling(window=Decay, min_periods=1).apply(_wma, raw=True)
+            def _linear_decay(x):
+                """Linear decay: simple average over the window"""
+                n = len(x)
+                if n <= 0:
+                    return 0
+                return np.mean(x)  # Simple average for linear decay
+
+            alpha_decayed = normalized_weight.rolling(window=window_size, min_periods=1).apply(_linear_decay, raw=True)
         else:
+            # No decay: use current values only
             alpha_decayed = normalized_weight
 
         alpha_final = alpha_decayed.shift(Delay)

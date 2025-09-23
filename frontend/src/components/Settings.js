@@ -5,7 +5,7 @@ import './Settings.css';
 const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
   const [settings, setSettings] = useState({
     neutralization: false,
-    decay: 4,
+    decay: 0,
     truncation: 0.08,
     pasteurization: 'On',
     nanHandling: 'Off',
@@ -91,8 +91,8 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
             <div className="setting-slider">
               <input
                 type="range"
-                min="1"
-                max="20"
+                min="0"
+                max="10"
                 value={settings.decay}
                 onChange={(e) => handleSettingChange('decay', parseInt(e.target.value))}
                 className="slider"
