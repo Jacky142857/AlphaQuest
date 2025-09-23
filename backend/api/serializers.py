@@ -11,7 +11,15 @@ class DateRangeSerializer(serializers.Serializer):
     end_date = serializers.DateField()
 
 class SettingsSerializer(serializers.Serializer):
-    neutralization = serializers.CharField(required=False)
+    neutralization = serializers.BooleanField(required=False)
     decay = serializers.IntegerField(required=False)
     truncation = serializers.FloatField(required=False)
-    # add others as needed
+    pasteurization = serializers.CharField(required=False)
+    nanHandling = serializers.CharField(required=False)
+    maxTrade = serializers.CharField(required=False)
+    delay = serializers.IntegerField(required=False)
+    commission = serializers.FloatField(required=False)
+    bookSize = serializers.IntegerField(required=False)
+    minWeight = serializers.FloatField(required=False)
+    maxWeight = serializers.FloatField(required=False)
+    rebalanceFreq = serializers.CharField(required=False)

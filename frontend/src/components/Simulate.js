@@ -14,7 +14,7 @@ function Simulate() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dataUploadOpen, setDataUploadOpen] = useState(false);
   const [strategySettings, setStrategySettings] = useState({
-    neutralization: 'Subindustry',
+    neutralization: false,
     decay: 4,
     truncation: 0.08,
     pasteurization: 'On',

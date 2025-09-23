@@ -4,7 +4,7 @@ import './Settings.css';
 
 const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
   const [settings, setSettings] = useState({
-    neutralization: 'Subindustry',
+    neutralization: false,
     decay: 4,
     truncation: 0.08,
     pasteurization: 'On',
@@ -72,17 +72,15 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
         <div className="settings-row">
           <div className="setting-group">
             <label className="setting-label">
-              NEUTRALIZATION ⓘ
+              MARKET NEUTRALIZATION ⓘ
             </label>
             <select
               className="setting-select"
-              value={settings.neutralization}
-              onChange={(e) => handleSettingChange('neutralization', e.target.value)}
+              value={settings.neutralization ? "On" : "Off"}
+              onChange={(e) => handleSettingChange('neutralization', e.target.value === "On")}
             >
-              <option value="Subindustry">Subindustry</option>
-              <option value="Industry">Industry</option>
-              <option value="Sector">Sector</option>
-              <option value="None">None</option>
+              <option value="Off">Off</option>
+              <option value="On">On</option>
             </select>
           </div>
 

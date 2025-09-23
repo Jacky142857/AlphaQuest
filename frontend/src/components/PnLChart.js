@@ -280,6 +280,14 @@ const PnLChart = ({ data, metrics, loading, isDataUploaded, hasFormula }) => {
               {data.dates.length}
             </span>
           </div>
+          {metrics.neutralization && (
+            <div className="metric-item">
+              <span className="metric-label">Market Neutralization</span>
+              <span className={`metric-value ${metrics.neutralization === 'On' ? 'neutral' : 'default'}`}>
+                {metrics.neutralization}
+              </span>
+            </div>
+          )}
         </div>
       )}
     </div>

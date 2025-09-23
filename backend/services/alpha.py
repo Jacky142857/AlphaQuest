@@ -212,11 +212,18 @@ def process_alpha_strategy(df: pd.DataFrame, alpha_formula_str: str, settings: d
     Truncation = settings.get('truncation', 0)
     Decay = settings.get('decay', 1)
     Delay = settings.get('delay', 1)
+    Neutralization = settings.get('neutralization', False)
 
     # Processing when result is a Series / numpy array (single time-series)
     if isinstance(df_alpha, (pd.Series, np.ndarray)):
         if isinstance(df_alpha, np.ndarray):
             df_alpha = pd.Series(df_alpha, index=Close.index)
+
+        # Apply neutralization if enabled (for single series, this just centers around 0)
+        if Neutralization:
+            alpha_mean = df_alpha.mean()
+            if not pd.isna(alpha_mean):
+                df_alpha = df_alpha - alpha_mean
 
         # shift by Delay (implement execution lag)
         alpha_final = df_alpha.shift(Delay)
@@ -242,6 +249,12 @@ def process_alpha_strategy(df: pd.DataFrame, alpha_formula_str: str, settings: d
             else:
                 # try to coerce
                 df_alpha = pd.DataFrame(df_alpha, index=Close.index)
+
+        # Apply neutralization if enabled (subtract cross-sectional mean each day)
+        if Neutralization:
+            # For each time period, subtract the mean across all stocks
+            alpha_means = df_alpha.mean(axis=1)
+            df_alpha = df_alpha.sub(alpha_means, axis=0)
 
         # Apply truncation (row-wise quantile clipping to remove extreme outliers)
         if Truncation and 0 < Truncation < 0.5:
@@ -327,7 +340,8 @@ def process_alpha_strategy(df: pd.DataFrame, alpha_formula_str: str, settings: d
         'pnl_data': {'dates': dates, 'values': pnl_values},
         'metrics': {
             'total_return': float(total_return),
-            'total_return_pct': f"{total_return * 100:.2f}%"
+            'total_return_pct': f"{total_return * 100:.2f}%",
+            'neutralization': 'On' if Neutralization else 'Off'
         }
     }
 
@@ -538,7 +552,8 @@ def process_alpha_strategy_multi(multi_stock_data: dict, alpha_formula_str: str,
                 'total_return_pct': f"{total_return * 100:.2f}%",
                 'stocks_count': len(close_data.columns),
                 'date_range': f"{dates[0]} to {dates[-1]}",
-                'method': 'Pure equal weighting (alpha=1) - matches equal_weighted_dj30.py logic'
+                'method': 'Pure equal weighting (alpha=1) - matches equal_weighted_dj30.py logic',
+                'neutralization': 'On' if Neutralization else 'Off'
             }
         }
 
@@ -546,9 +561,16 @@ def process_alpha_strategy_multi(multi_stock_data: dict, alpha_formula_str: str,
     Truncation = settings.get('truncation', 0.01)
     Decay = settings.get('decay', 1)
     Delay = settings.get('delay', 1)
+    Neutralization = settings.get('neutralization', False)
 
     # If result is DataFrame (preferred)
     if isinstance(df_alpha, pd.DataFrame):
+        # Apply neutralization if enabled (subtract cross-sectional mean each day)
+        if Neutralization:
+            # For each time period, subtract the mean across all stocks
+            alpha_means = df_alpha.mean(axis=1)
+            df_alpha = df_alpha.sub(alpha_means, axis=0)
+
         # Clip row-wise to remove outliers
         if Truncation and 0 < Truncation < 0.5:
             lower = df_alpha.quantile(Truncation, axis=1)
@@ -644,6 +666,7 @@ def process_alpha_strategy_multi(multi_stock_data: dict, alpha_formula_str: str,
             'total_return': float(total_return),
             'total_return_pct': f"{total_return * 100:.2f}%",
             'stocks_count': len(stock_symbols),
-            'date_range': f"{dates[0]} to {dates[-1]}"
+            'date_range': f"{dates[0]} to {dates[-1]}",
+            'neutralization': 'On' if Neutralization else 'Off'
         }
     }
