@@ -3,6 +3,7 @@ import { Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../contexts/ThemeContext';
 import Documentation from './learn/Documentation';
 import Operators from './learn/Operators';
+import Logical from './learn/Logical';
 import Keywords from './learn/Keywords';
 import './Learn.css';
 
@@ -35,6 +36,12 @@ const Learn = () => {
           ⚙️ Operators
         </Link>
         <Link
+          to="/learn/logical"
+          className={`learn-nav-item ${isActive('/learn/logical') ? 'active' : ''}`}
+        >
+          🔗 Logical
+        </Link>
+        <Link
           to="/learn/keywords"
           className={`learn-nav-item ${isActive('/learn/keywords') ? 'active' : ''}`}
         >
@@ -47,6 +54,7 @@ const Learn = () => {
           <Route path="/" element={<Documentation theme={theme} />} />
           <Route path="/documentation" element={<Documentation theme={theme} />} />
           <Route path="/operators" element={<Operators theme={theme} />} />
+          <Route path="/logical" element={<Logical theme={theme} />} />
           <Route path="/keywords" element={<Keywords theme={theme} />} />
         </Routes>
       </div>

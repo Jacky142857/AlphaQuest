@@ -23,7 +23,9 @@ const AlphaFormulaEditor = ({
   // Define available functions and variables for autocomplete
   const alphaFunctions = [
     'Rank', 'Delta', 'Sum', 'Abs', 'Sqrt',
-    'Ts_rank', 'Ts_argmax', 'quantile'
+    'Ts_rank', 'Ts_argmax', 'quantile',
+    'trade_when', 'hump', 'bucket', 'group_neutralize',
+    'ts_sum', 'Returns', 'ts_delta'
   ];
 
   const alphaVariables = [
@@ -32,8 +34,31 @@ const AlphaFormulaEditor = ({
 
   const alphaParameters = [
     'driver=gaussian', 'driver=uniform', 'driver=cauchy',
-    'sigma=0.5', 'sigma=1.0', 'sigma=2.0'
+    'sigma=0.5', 'sigma=1.0', 'sigma=2.0',
+    'buckets="0.2,0.5,0.7"', 'range="0.1,1,0.1"',
+    'skipBegin=True', 'skipEnd=True', 'skipBoth=True', 'NANGroup=True',
+    'hump=0.01', 'hump=0.05'
   ];
+
+  // Function to get appropriate snippet for each function
+  const getSnippetForFunction = (func) => {
+    const snippets = {
+      'quantile': 'quantile(${1:expression}, driver=${2:gaussian}, sigma=${3:0.5})',
+      'trade_when': 'trade_when(${1:trigger_condition}, ${2:alpha_expression}, ${3:exit_condition})',
+      'hump': 'hump(${1:alpha_values}, hump=${2:0.01})',
+      'bucket': 'bucket(${1:expression}, buckets="${2:0.2,0.5,0.7}", skipBoth=${3:True})',
+      'group_neutralize': 'group_neutralize(${1:values}, ${2:groups})',
+      'ts_sum': 'ts_sum(${1:expression}, ${2:periods})',
+      'Returns': 'Returns(${1:price_series}, ${2:periods})',
+      'ts_delta': 'ts_delta(${1:expression}, ${2:periods})',
+      'Ts_rank': 'Ts_rank(${1:expression}, ${2:periods})',
+      'Ts_argmax': 'Ts_argmax(${1:expression}, ${2:periods})',
+      'Delta': 'Delta(${1:expression}, ${2:periods})',
+      'Sum': 'Sum(${1:expression}, ${2:periods})'
+    };
+
+    return snippets[func] || `${func}($\{1:})`;
+  };
 
   // Custom completions for ACE editor
   useEffect(() => {
@@ -48,7 +73,7 @@ const AlphaFormulaEditor = ({
         score: 1000,
         meta: "function",
         caption: func,
-        snippet: func === 'quantile' ? 'quantile(${1:expression}, driver=${2:gaussian}, sigma=${3:0.5})' : `${func}(\${1:})`
+        snippet: getSnippetForFunction(func)
       })),
       ...alphaVariables.map(variable => ({
         name: variable,
@@ -138,14 +163,19 @@ const AlphaFormulaEditor = ({
       description: "Price change weighted by volume"
     },
     {
-      title: "Mean Reversion",
-      formula: "Rank(Open - Close)",
-      description: "Contrarian signal based on daily gap"
+      title: "Bucket Group Neutralization",
+      formula: "my_group = bucket(Rank(Volume), buckets=\"0.2,0.5,0.7\", skipBoth=True); group_neutralize(Returns(Close, 1), my_group)",
+      description: "Volume-based group neutralized returns"
     },
     {
-      title: "Momentum Signal",
-      formula: "Rank(Close - Delta(Close, 5))",
-      description: "5-day price momentum"
+      title: "Conditional Trading",
+      formula: "trade_when(Volume >= ts_sum(Volume, 5)/5, Rank(-Returns(Close, 1)), -1)",
+      description: "Trade only on high volume days"
+    },
+    {
+      title: "Turnover Control",
+      formula: "hump(Rank(Returns(Close, 1)), 0.02)",
+      description: "Momentum with 2% turnover control"
     },
     {
       title: "Advanced Quantile",
@@ -246,6 +276,7 @@ const AlphaFormulaEditor = ({
               <li><code>Sum(x, n)</code> - Rolling sum over n periods</li>
               <li><code>Abs(x)</code> - Absolute value</li>
               <li><code>Sqrt(x)</code> - Square root</li>
+              <li><code>Returns(x, n)</code> - n-period returns</li>
             </ul>
           </div>
           <div className="help-section">
@@ -253,7 +284,18 @@ const AlphaFormulaEditor = ({
             <ul>
               <li><code>Ts_rank(x, n)</code> - Time-series rank</li>
               <li><code>Ts_argmax(x, n)</code> - Days since maximum</li>
+              <li><code>ts_sum(x, n)</code> - Rolling sum</li>
+              <li><code>ts_delta(x, n)</code> - Time-series difference</li>
               <li><code>quantile(x, driver, sigma)</code> - Distribution transform</li>
+            </ul>
+          </div>
+          <div className="help-section">
+            <h4>Advanced Operators</h4>
+            <ul>
+              <li><code>bucket(x, buckets)</code> - Group values into buckets</li>
+              <li><code>group_neutralize(x, groups)</code> - Subtract group means</li>
+              <li><code>trade_when(trigger, alpha, exit)</code> - Conditional trading</li>
+              <li><code>hump(alpha, threshold)</code> - Turnover reduction</li>
             </ul>
           </div>
           <div className="help-section">
