@@ -1,9 +1,9 @@
 import React from 'react';
 import './LearnContent.css';
 
-const Documentation = () => {
+const Documentation = ({ theme }) => {
   return (
-    <div className="learn-content-wrapper">
+    <div className={`learn-content-wrapper ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
       <h2>📖 General Documentation</h2>
 
       <section className="content-section">

@@ -1,0 +1,381 @@
+/* AlphaFormulaEditor.css */
+
+.alpha-formula-container {
+  text-align: left;
+  margin-bottom: 30px;
+}
+
+.alpha-formula-container h2 {
+  color: #333;
+  margin-bottom: 20px;
+  font-size: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.alpha-formula-container h2::before {
+  content: "📝";
+  font-size: 24px;
+}
+
+.editor-container {
+  background: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 0;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  overflow: hidden;
+  transition: border-color 0.3s ease;
+}
+
+.editor-container:focus-within {
+  border-color: #4a90e2;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.15);
+}
+
+.editor-wrapper {
+  position: relative;
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: #f8f9fa;
+  border-top: 1px solid #e0e0e0;
+  font-size: 12px;
+}
+
+.editor-shortcuts {
+  display: flex;
+  gap: 20px;
+  color: #666;
+}
+
+.editor-shortcuts span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.validation-success {
+  color: #28a745;
+  font-weight: 500;
+}
+
+.submit-button {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 500;
+  margin-top: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #357abd;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.3);
+}
+
+.submit-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.submit-button.disabled {
+  background: #e9ecef;
+  color: #6c757d;
+}
+
+/* Formula Examples */
+.formula-examples {
+  margin-top: 30px;
+  padding: 20px;
+  background: #f8f9fa;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.formula-examples h3 {
+  color: #4a90e2;
+  margin-bottom: 16px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.formula-examples h3::before {
+  content: "💡";
+}
+
+.examples-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 16px;
+}
+
+.example-card {
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.example-card:hover {
+  border-color: #4a90e2;
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.1);
+  transform: translateY(-1px);
+}
+
+.example-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.example-formula {
+  display: block;
+  background: #f1f3f4;
+  color: #e74c3c;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 13px;
+  margin: 8px 0;
+  border: 1px solid #e0e0e0;
+}
+
+.example-description {
+  color: #666;
+  font-size: 13px;
+  font-style: italic;
+}
+
+/* Formula Help */
+.formula-help {
+  margin-top: 30px;
+  padding: 20px;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+}
+
+.formula-help h3 {
+  color: #4a90e2;
+  margin-bottom: 16px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.formula-help h3::before {
+  content: "📚";
+}
+
+.help-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 24px;
+}
+
+.help-section h4 {
+  color: #333;
+  margin-bottom: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 4px;
+}
+
+.help-section ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.help-section li {
+  padding: 6px 0;
+  border-bottom: 1px solid #f0f0f0;
+  font-size: 13px;
+}
+
+.help-section li:last-child {
+  border-bottom: none;
+}
+
+.help-section code {
+  background: #f1f3f4;
+  color: #e74c3c;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Monaco', 'Menlo', monospace;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Dark Theme Styles */
+.dark-theme .alpha-formula-container h2 {
+  color: #ffffff;
+}
+
+.dark-theme .editor-container {
+  background: #2a3b5c;
+  border-color: #4a5568;
+}
+
+.dark-theme .editor-container:focus-within {
+  border-color: #4a90e2;
+  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25);
+}
+
+.dark-theme .editor-footer {
+  background: #1a1c2e;
+  border-top-color: #4a5568;
+}
+
+.dark-theme .editor-shortcuts {
+  color: #b0b0b0;
+}
+
+.dark-theme .formula-examples {
+  background: #2a3b5c;
+  border-color: #4a5568;
+}
+
+.dark-theme .example-card {
+  background: #1a1c2e;
+  border-color: #4a5568;
+  color: white;
+}
+
+.dark-theme .example-card:hover {
+  border-color: #4a90e2;
+}
+
+.dark-theme .example-title {
+  color: white;
+}
+
+.dark-theme .example-formula {
+  background: #0f0f23;
+  border-color: #4a5568;
+}
+
+.dark-theme .example-description {
+  color: #b0b0b0;
+}
+
+.dark-theme .formula-help {
+  background: #2a3b5c;
+  border-color: #4a5568;
+}
+
+.dark-theme .help-section h4 {
+  color: white;
+  border-bottom-color: #4a5568;
+}
+
+.dark-theme .help-section li {
+  color: #e0e0e0;
+  border-bottom-color: #4a5568;
+}
+
+.dark-theme .help-section code {
+  background: #0f0f23;
+  color: #58a6ff;
+}
+
+/* Calculation Error Styles */
+.calculation-error {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: #fff5f5;
+  border: 1px solid #feb2b2;
+  border-radius: 8px;
+  margin-top: 16px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.error-icon {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.error-content {
+  flex: 1;
+}
+
+.error-title {
+  font-weight: 600;
+  color: #e53e3e;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+.error-message {
+  color: #c53030;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.dark-theme .calculation-error {
+  background: rgba(229, 62, 62, 0.1);
+  border-color: rgba(229, 62, 62, 0.3);
+}
+
+.dark-theme .error-title {
+  color: #fc8181;
+}
+
+.dark-theme .error-message {
+  color: #feb2b2;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .examples-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .help-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-footer {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+
+  .editor-shortcuts {
+    gap: 16px;
+  }
+}

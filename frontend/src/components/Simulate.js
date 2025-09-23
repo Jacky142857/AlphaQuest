@@ -9,6 +9,7 @@ function Simulate() {
   const [pnlData, setPnlData] = useState(null);
   const [metrics, setMetrics] = useState(null);
   const [isDataUploaded, setIsDataUploaded] = useState(false);
+  const [hasFormula, setHasFormula] = useState(false);
   const [loading, setLoading] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dataUploadOpen, setDataUploadOpen] = useState(false);
@@ -71,6 +72,7 @@ function Simulate() {
             isDataUploaded={isDataUploaded}
             setLoading={setLoading}
             strategySettings={strategySettings}
+            onFormulaChange={setHasFormula}
           />
         </div>
 
@@ -79,6 +81,8 @@ function Simulate() {
             data={pnlData}
             metrics={metrics}
             loading={loading}
+            isDataUploaded={isDataUploaded}
+            hasFormula={hasFormula}
           />
         </div>
       </div>

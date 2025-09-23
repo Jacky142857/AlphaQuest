@@ -1,22 +1,13 @@
 // frontend/src/components/AlphaFormula.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import AlphaFormulaEditor from './AlphaFormulaEditor';
+import './AlphaFormulaEditor.css';
 
-const AlphaFormula = ({ onResult, isDataUploaded, setLoading, strategySettings }) => {
+const AlphaFormula = ({ onResult, isDataUploaded, setLoading, strategySettings, onFormulaChange }) => {
   const [formula, setFormula] = useState('');
   const [error, setError] = useState(null);
-
-  const exampleFormulas = [
-    'Close / (Close - 0.00000001)',
-    'Rank(Delta(Close, 1))',
-    'Rank(Ts_rank(Close, 5) * Ts_rank(Volume, 10))',
-    'Delta(Close, 1) / Close',
-    'Rank(High - Low)',
-    'Sum(Volume, 5) / Volume',
-    'Abs(Delta(Close, 2))',
-    'Sqrt(Volume / Sum(Volume, 10))',
-    'Rank(Vwap - Close)'
-  ];
+  const [loading, setLocalLoading] = useState(false);
 
   const handleSubmit = async () => {
     if (!formula.trim()) {
@@ -29,6 +20,7 @@ const AlphaFormula = ({ onResult, isDataUploaded, setLoading, strategySettings }
       return;
     }
 
+    setLocalLoading(true);
     setLoading(true);
     setError(null);
 
@@ -39,73 +31,42 @@ const AlphaFormula = ({ onResult, isDataUploaded, setLoading, strategySettings }
       });
 
       onResult(response.data);
+      setError(null);
     } catch (error) {
       setError(error.response?.data?.error || 'Calculation failed');
     } finally {
+      setLocalLoading(false);
       setLoading(false);
     }
   };
 
-  const handleExampleClick = (exampleFormula) => {
-    setFormula(exampleFormula);
-    setError(null);
+  const handleFormulaChange = (newFormula) => {
+    setFormula(newFormula);
+    if (error) setError(null); // Clear error when user starts typing
+    if (onFormulaChange) {
+      onFormulaChange(newFormula.trim().length > 0);
+    }
   };
 
   return (
-    <div className="alpha-formula-container">
-      <h2>Alpha Formula</h2>
-      
-      <textarea
-        className="formula-input"
+    <div>
+      <AlphaFormulaEditor
         value={formula}
-        onChange={(e) => setFormula(e.target.value)}
-        placeholder="Enter your alpha formula here...
-Example: Close / (Close - 0.00000001)
-
-Available functions:
-- Rank(x): Ranks values
-- Delta(x, n): Difference with n periods ago
-- Sum(x, n): Rolling sum over n periods
-- Abs(x): Absolute values
-- Sqrt(x): Square root
-- Ts_rank(x, n): Time series rank
-- Ts_argmax(x, n): Time series argmax
-- quantile(x, driver='gaussian', sigma=1.0): Apply distribution transformation
-  * driver: 'gaussian', 'uniform', 'cauchy'
-  * sigma: scale parameter
-
-Available variables:
-- Open, High, Low, Close, Volume, Vwap"
+        onChange={handleFormulaChange}
+        onSubmit={handleSubmit}
+        isDataUploaded={isDataUploaded}
+        loading={loading}
       />
-      
+
       {error && (
-        <div className="error-message">
-          {error}
+        <div className="calculation-error">
+          <div className="error-icon">❌</div>
+          <div className="error-content">
+            <div className="error-title">Calculation Error</div>
+            <div className="error-message">{error}</div>
+          </div>
         </div>
       )}
-      
-      <button 
-        className="submit-button"
-        onClick={handleSubmit}
-        disabled={!formula.trim() || !isDataUploaded}
-      >
-        Calculate Alpha
-      </button>
-
-      <div className="formula-examples">
-        <h3>Example Formulas (click to use):</h3>
-        <ul>
-          {exampleFormulas.map((example, index) => (
-            <li 
-              key={index} 
-              onClick={() => handleExampleClick(example)}
-              title="Click to use this formula"
-            >
-              {example}
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   );
 };

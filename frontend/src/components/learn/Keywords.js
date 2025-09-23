@@ -1,7 +1,7 @@
 import React from 'react';
 import './LearnContent.css';
 
-const Keywords = () => {
+const Keywords = ({ theme }) => {
   const priceKeywords = [
     {
       keyword: 'Open',
@@ -70,7 +70,7 @@ const Keywords = () => {
   ];
 
   return (
-    <div className="learn-content-wrapper">
+    <div className={`learn-content-wrapper ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
       <h2>🔑 Market Data Keywords</h2>
 
       <section className="content-section">

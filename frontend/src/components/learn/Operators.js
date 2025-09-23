@@ -1,7 +1,7 @@
 import React from 'react';
 import './LearnContent.css';
 
-const Operators = () => {
+const Operators = ({ theme }) => {
   const operators = [
     {
       name: 'Rank',
@@ -62,7 +62,7 @@ const Operators = () => {
   ];
 
   return (
-    <div className="learn-content-wrapper">
+    <div className={`learn-content-wrapper ${theme === 'dark' ? 'dark-theme' : 'light-theme'}`}>
       <h2>⚙️ Mathematical Operators</h2>
 
       <section className="content-section">
