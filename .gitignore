@@ -92,10 +92,15 @@ jspm_packages/
 tmp/
 temp/
 
-# Data files (optional - remove if you want to commit data)
-*.csv
+# Data files - Allow backend data but exclude temp files
+# *.csv (commented out to allow backend/data/*.csv)
 *.png
-data/
+# data/ (commented out to allow backend/data/)
+
+# Exclude specific data patterns but allow backend/data/
+*_results.csv
+temp_data/
+uploaded_data/
 
 # Results and outputs
 *_results.csv

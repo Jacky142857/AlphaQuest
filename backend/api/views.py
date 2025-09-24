@@ -46,13 +46,35 @@ def upload_multiple_data(request):
 @csrf_exempt
 @api_view(['POST'])
 def load_dow30_data(request):
-    
-    data_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), 'data')
+
+    # Get the backend directory, then add 'data'
+    backend_dir = os.path.dirname(os.path.dirname(__file__))  # backend/
+    data_dir = os.path.join(backend_dir, 'data')
+
+    # Debug logging
+    print(f"Looking for data directory at: {data_dir}")
+    print(f"Directory exists: {os.path.exists(data_dir)}")
+    if os.path.exists(data_dir):
+        files = os.listdir(data_dir)
+        csv_files = [f for f in files if f.endswith('.csv')]
+        print(f"Found {len(csv_files)} CSV files: {csv_files[:5]}...")  # Show first 5
+
     try:
         result = load_dow30_from_dir(data_dir)
         return Response(result)
+    except FileNotFoundError as e:
+        # Provide helpful error message with path info
+        return Response({
+            'error': 'Data directory not found',
+            'attempted_path': data_dir,
+            'exists': os.path.exists(data_dir),
+            'suggestion': 'Please ensure DOW30 data files are uploaded or available'
+        }, status=status.HTTP_404_NOT_FOUND)
     except Exception as e:
-        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        return Response({
+            'error': str(e),
+            'data_dir': data_dir
+        }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 @csrf_exempt
 @api_view(['POST'])

@@ -1,0 +1,36 @@
+Dow Jones 30 Data Download Summary
+Generated on: 2025-09-25 01:37:42
+Date range: 2020-09-26 to 2025-09-25
+Successful downloads: 29
+Failed downloads: 0
+
+Successful tickers:
+  AXP
+  MRK
+  CAT
+  CSCO
+  MSFT
+  DOW
+  UNH
+  AAPL
+  JNJ
+  GS
+  INTC
+  IBM
+  NKE
+  CVX
+  BA
+  PG
+  KO
+  V
+  DIS
+  CRM
+  MCD
+  HON
+  WMT
+  TRV
+  VZ
+  MMM
+  JPM
+  HD
+  AMGN

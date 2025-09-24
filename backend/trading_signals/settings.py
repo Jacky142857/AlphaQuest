@@ -110,8 +110,16 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 # WhiteNoise configuration for production
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Include data directory in static files dirs for deployment
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'data'),
+] if os.path.exists(os.path.join(BASE_DIR, 'data')) else []
+
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# Data directory configuration
+DATA_DIR = os.path.join(BASE_DIR, 'data')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
