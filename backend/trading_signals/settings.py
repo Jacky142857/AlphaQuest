@@ -41,6 +41,10 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+# Security settings for production
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = not DEBUG  # Only redirect in production
+
 ROOT_URLCONF = 'trading_signals.urls'
 
 TEMPLATES = [
@@ -107,13 +111,11 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
-# WhiteNoise configuration for production
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# WhiteNoise configuration for production - simplified to avoid issues
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 
-# Include data directory in static files dirs for deployment
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'data'),
-] if os.path.exists(os.path.join(BASE_DIR, 'data')) else []
+# Static files configuration - DO NOT include large data directories
+# STATICFILES_DIRS = []  # Keep empty to avoid WhiteNoise issues with large CSV files
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -6,18 +6,22 @@ from django.conf.urls.static import static
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 
-# Simple root view
-@require_http_methods(["GET"])
+# Simple root view with safety measures
 def root_view(request):
-    return JsonResponse({
-        'message': 'AlphaQuest Backend API',
-        'status': 'running',
-        'endpoints': {
-            'admin': '/admin/',
-            'api': '/api/',
-            'api_docs': '/api/docs/'
-        }
-    })
+    try:
+        return JsonResponse({
+            'message': 'AlphaQuest Backend API',
+            'status': 'running',
+            'method': request.method,
+            'endpoints': {
+                'admin': '/admin/',
+                'api': '/api/',
+            }
+        })
+    except Exception as e:
+        import logging
+        logging.error(f"Root view error: {e}")
+        return JsonResponse({'error': 'Server error', 'status': 'error'}, status=500)
 
 urlpatterns = [
     path('', root_view, name='root'),
