@@ -3,9 +3,13 @@
 
 echo "Starting build process for AlphaQuest backend..."
 
-# Install Python dependencies
+# Set memory-friendly pip options
+export PIP_NO_CACHE_DIR=1
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+
+# Install Python dependencies with reduced memory usage
 echo "Installing Python dependencies..."
-pip install -r requirements.txt
+pip install --no-cache-dir -r requirements.txt
 
 # Collect static files for production
 echo "Collecting static files..."

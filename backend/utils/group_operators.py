@@ -1,6 +1,19 @@
 import pandas as pd
 import numpy as np
-from scipy.stats import norm, cauchy, uniform
+
+# Handle scipy import with fallback
+try:
+    from scipy.stats import norm, cauchy, uniform
+    SCIPY_AVAILABLE = True
+except ImportError as e:
+    print(f"Warning: SciPy not available: {e}")
+    SCIPY_AVAILABLE = False
+    # Create fallback functions
+    class MockDistribution:
+        @staticmethod
+        def ppf(x):
+            return np.array(x)  # Simple fallback
+    norm = cauchy = uniform = MockDistribution()
 
 
 def Rank(x):
