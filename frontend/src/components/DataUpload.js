@@ -16,7 +16,10 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
-  // Handle escape key to close modal
+  // UI state for tab selection
+  const [selectedDataSource, setSelectedDataSource] = useState(null);
+
+  // Handle escape key to close modal and reset state
   useEffect(() => {
     const handleEscape = (e) => {
       if (e.key === 'Escape' && isOpen) {
@@ -27,6 +30,10 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
     if (isOpen) {
       document.addEventListener('keydown', handleEscape);
       document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    } else {
+      // Reset state when modal is closed
+      setSelectedDataSource(null);
+      setUploadStatus(null);
     }
 
     return () => {
@@ -206,183 +213,308 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
       </button>
 
       {isOpen && (
-        <div className="data-upload-overlay" onClick={onToggle}>
+        <div className="data-upload-overlay" onClick={() => {
+          setSelectedDataSource(null);
+          setUploadStatus(null);
+          onToggle();
+        }}>
           <div className="data-upload-modal" onClick={(e) => e.stopPropagation()}>
             <div className="data-upload-header">
               <h3>Data Source Options</h3>
-              <button className="data-upload-close-btn" onClick={onToggle}>×</button>
+              <button className="data-upload-close-btn" onClick={() => {
+                setSelectedDataSource(null);
+                setUploadStatus(null);
+                onToggle();
+              }}>×</button>
             </div>
 
             <div className="data-upload-content">
-        {/* Single File Upload */}
-        <div className="upload-section">
-          <h4>Upload Single CSV File</h4>
-        <div
-          className={`upload-area ${dragOver ? 'dragover' : ''}`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => document.getElementById('file-input').click()}
-        >
-          <div className="upload-icon">📁</div>
-          <div className="upload-text">
-            {file ? file.name : 'Drop your CSV file here or click to browse'}
-          </div>
-          <div className="upload-text" style={{ fontSize: '14px', color: '#888' }}>
-            Required columns: Open, High, Low, Close, Volume
-          </div>
-          <input
-            id="file-input"
-            type="file"
-            accept=".csv"
-            onChange={handleFileChange}
-            className="file-input"
-          />
-        </div>
+              {/* Data Source Selection Cards */}
+              {!selectedDataSource && (
+                <div className="data-source-selection">
+                  <h4 style={{ textAlign: 'center', marginBottom: '30px', color: '#333' }}>
+                    Choose Your Data Source
+                  </h4>
 
-        <button
-          className="upload-button"
-          onClick={handleUpload}
-          disabled={!file || uploading}
-        >
-          {uploading ? 'Uploading...' : 'Upload Single File'}
-        </button>
-      </div>
+                  <div className="data-source-cards">
+                    {/* CSV File Card */}
+                    <div
+                      className="data-source-card"
+                      onClick={() => setSelectedDataSource('csv')}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="card-icon">📁</div>
+                      <h5>Upload CSV File</h5>
+                      <p>Upload your own data file</p>
+                      <small>OHLCV format required</small>
+                    </div>
 
-      {/* Dow Jones 30 Data */}
-      <div className="upload-section" style={{ marginTop: '20px' }}>
-        <h4>Or Load Dow Jones 30 Data</h4>
-        <p style={{ fontSize: '14px', color: '#666', margin: '10px 0' }}>
-          Load all 30 stocks from the Dow Jones Industrial Average with date intersection
-        </p>
-        <button
-          className="upload-button dow30-button"
-          onClick={handleLoadDow30}
-          disabled={loadingDow30}
-        >
-          {loadingDow30 ? 'Loading...' : 'Load Dow Jones 30'}
-        </button>
-      </div>
+                    {/* Dow Jones 30 Card */}
+                    <div
+                      className="data-source-card"
+                      onClick={() => setSelectedDataSource('dow30')}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="card-icon">📊</div>
+                      <h5>Dow Jones 30</h5>
+                      <p>Load all 30 DJ stocks</p>
+                      <small>Pre-loaded historical data</small>
+                    </div>
 
-      {/* Yahoo Finance Data */}
-      <div className="upload-section" style={{ marginTop: '20px' }}>
-        <h4>Or Load Data from Yahoo Finance</h4>
-        <p style={{ fontSize: '14px', color: '#666', margin: '10px 0' }}>
-          Enter stock tickers separated by commas (e.g., AAPL, GOOGL, MSFT) and select a date range
-        </p>
+                    {/* Yahoo Finance Card */}
+                    <div
+                      className="data-source-card"
+                      onClick={() => setSelectedDataSource('yfinance')}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="card-icon">🌐</div>
+                      <h5>Yahoo Finance</h5>
+                      <p>Fetch live market data</p>
+                      <small>Any stocks, custom dates</small>
+                    </div>
+                  </div>
+                </div>
+              )}
 
-        <div className="yfinance-inputs">
-          <label>
-            Stock Tickers:
-            <input
-              type="text"
-              value={tickers}
-              onChange={(e) => setTickers(e.target.value)}
-              placeholder="AAPL, GOOGL, MSFT, TSLA"
-              className="ticker-input"
-              style={{
-                width: '100%',
-                padding: '8px',
-                margin: '5px 0 15px 0',
-                border: '1px solid #ddd',
-                borderRadius: '4px',
-                fontSize: '14px'
-              }}
-            />
-          </label>
+              {/* Selected Data Source Content */}
+              {selectedDataSource && (
+                <div className="selected-data-source">
+                  <div className="data-source-header">
+                    <button
+                      className="back-button"
+                      onClick={() => setSelectedDataSource(null)}
+                      style={{
+                        background: 'none',
+                        border: 'none',
+                        fontSize: '18px',
+                        cursor: 'pointer',
+                        color: '#666'
+                      }}
+                    >
+                      ← Back
+                    </button>
+                    <h4 style={{ margin: 0, flex: 1, textAlign: 'center' }}>
+                      {selectedDataSource === 'csv' && 'Upload CSV File'}
+                      {selectedDataSource === 'dow30' && 'Dow Jones 30 Data'}
+                      {selectedDataSource === 'yfinance' && 'Yahoo Finance Data'}
+                    </h4>
+                    <div style={{ width: '60px' }}></div> {/* Spacer for centering */}
+                  </div>
 
-          <div className="date-inputs" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
-            <label style={{ flex: 1 }}>
-              Start Date:
-              <input
-                type="date"
-                value={startDate}
-                onChange={(e) => setStartDate(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  margin: '5px 0',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-              />
-            </label>
-            <label style={{ flex: 1 }}>
-              End Date:
-              <input
-                type="date"
-                value={endDate}
-                onChange={(e) => setEndDate(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  margin: '5px 0',
-                  border: '1px solid #ddd',
-                  borderRadius: '4px'
-                }}
-              />
-            </label>
-          </div>
-        </div>
+                  {/* CSV Upload Content */}
+                  {selectedDataSource === 'csv' && (
+                    <div className="upload-section">
+                      <p style={{ fontSize: '14px', color: '#666', margin: '20px 0 15px 0' }}>
+                        Upload a CSV file with your stock data. Required columns: Open, High, Low, Close, Volume
+                      </p>
 
-        <button
-          className="upload-button yfinance-button"
-          onClick={handleLoadYFinance}
-          disabled={loadingYFinance || !tickers.trim() || !startDate || !endDate}
-          style={{
-            backgroundColor: loadingYFinance || !tickers.trim() || !startDate || !endDate ? '#ccc' : '#007bff',
-            cursor: loadingYFinance || !tickers.trim() || !startDate || !endDate ? 'not-allowed' : 'pointer'
-          }}
-        >
-          {loadingYFinance ? 'Loading from Yahoo Finance...' : 'Load from Yahoo Finance'}
-        </button>
-      </div>
+                      <div
+                        className={`upload-area ${dragOver ? 'dragover' : ''}`}
+                        onDrop={handleDrop}
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onClick={() => document.getElementById('file-input').click()}
+                      >
+                        <div className="upload-icon">📁</div>
+                        <div className="upload-text">
+                          {file ? file.name : 'Drop your CSV file here or click to browse'}
+                        </div>
+                        <input
+                          id="file-input"
+                          type="file"
+                          accept=".csv"
+                          onChange={handleFileChange}
+                          className="file-input"
+                        />
+                      </div>
 
-      {/* Date Range Picker */}
-      {dateRange && (
-        <div className="date-range-section" style={{ marginTop: '20px' }}>
-          <h4>Select Date Range</h4>
-          <p style={{ fontSize: '14px', color: '#666' }}>
-            Available range: {dateRange.min_date} to {dateRange.max_date}
-          </p>
-          <div className="date-inputs">
-            <label>
-              Start Date:
-              <input
-                type="date"
-                min={dateRange.min_date}
-                max={dateRange.max_date}
-                defaultValue={dateRange.min_date}
-                onChange={(e) => {
-                  const endDateInput = document.getElementById('end-date');
-                  if (endDateInput.value) {
-                    handleDateRangeChange(e.target.value, endDateInput.value);
-                  }
-                }}
-              />
-            </label>
-            <label>
-              End Date:
-              <input
-                id="end-date"
-                type="date"
-                min={dateRange.min_date}
-                max={dateRange.max_date}
-                defaultValue={dateRange.max_date}
-                onChange={(e) => {
-                  const startDateInput = document.querySelector('input[type="date"]');
-                  if (startDateInput.value) {
-                    handleDateRangeChange(startDateInput.value, e.target.value);
-                  }
-                }}
-              />
-            </label>
-          </div>
-        </div>
-      )}
+                      <button
+                        className="upload-button"
+                        onClick={handleUpload}
+                        disabled={!file || uploading}
+                      >
+                        {uploading ? 'Uploading...' : 'Upload File'}
+                      </button>
+                    </div>
+                  )}
 
+                  {/* Dow Jones 30 Content */}
+                  {selectedDataSource === 'dow30' && (
+                    <div className="upload-section">
+                      <p style={{ fontSize: '14px', color: '#666', margin: '20px 0 15px 0' }}>
+                        Load historical data for all 30 stocks in the Dow Jones Industrial Average.
+                        This includes companies like Apple (AAPL), Microsoft (MSFT), and Boeing (BA).
+                      </p>
+
+                      <div style={{
+                        background: '#f8f9fa',
+                        padding: '15px',
+                        borderRadius: '8px',
+                        marginBottom: '20px',
+                        fontSize: '13px',
+                        color: '#666'
+                      }}>
+                        <strong>What's included:</strong><br/>
+                        • All 30 Dow Jones stocks<br/>
+                        • Historical OHLCV data<br/>
+                        • Automatically filtered to common date range
+                      </div>
+
+                      <button
+                        className="upload-button dow30-button"
+                        onClick={handleLoadDow30}
+                        disabled={loadingDow30}
+                      >
+                        {loadingDow30 ? 'Loading...' : 'Load Dow Jones 30'}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Yahoo Finance Content */}
+                  {selectedDataSource === 'yfinance' && (
+                    <div className="upload-section">
+                      <p style={{ fontSize: '14px', color: '#666', margin: '20px 0 15px 0' }}>
+                        Fetch real-time data from Yahoo Finance for any publicly traded stocks.
+                        Enter ticker symbols and select your preferred date range.
+                      </p>
+
+                      <div className="yfinance-inputs">
+                        <label style={{ display: 'block', marginBottom: '15px' }}>
+                          <strong>Stock Tickers:</strong>
+                          <input
+                            type="text"
+                            value={tickers}
+                            onChange={(e) => setTickers(e.target.value)}
+                            placeholder="AAPL, GOOGL, MSFT, TSLA"
+                            className="ticker-input"
+                            style={{
+                              width: '100%',
+                              padding: '10px',
+                              margin: '8px 0 0 0',
+                              border: '1px solid #ddd',
+                              borderRadius: '6px',
+                              fontSize: '14px',
+                              fontFamily: 'monospace'
+                            }}
+                          />
+                          <small style={{ color: '#888', fontSize: '12px' }}>
+                            Separate multiple tickers with commas
+                          </small>
+                        </label>
+
+                        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '20px' }}>
+                          <label>
+                            <strong>Start Date:</strong>
+                            <input
+                              type="date"
+                              value={startDate}
+                              onChange={(e) => setStartDate(e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '10px',
+                                margin: '8px 0 0 0',
+                                border: '1px solid #ddd',
+                                borderRadius: '6px'
+                              }}
+                            />
+                          </label>
+                          <label>
+                            <strong>End Date:</strong>
+                            <input
+                              type="date"
+                              value={endDate}
+                              onChange={(e) => setEndDate(e.target.value)}
+                              style={{
+                                width: '100%',
+                                padding: '10px',
+                                margin: '8px 0 0 0',
+                                border: '1px solid #ddd',
+                                borderRadius: '6px'
+                              }}
+                            />
+                          </label>
+                        </div>
+                      </div>
+
+                      <button
+                        className="upload-button yfinance-button"
+                        onClick={handleLoadYFinance}
+                        disabled={loadingYFinance || !tickers.trim() || !startDate || !endDate}
+                        style={{
+                          backgroundColor: loadingYFinance || !tickers.trim() || !startDate || !endDate ? '#ccc' : '#007bff',
+                          cursor: loadingYFinance || !tickers.trim() || !startDate || !endDate ? 'not-allowed' : 'pointer'
+                        }}
+                      >
+                        {loadingYFinance ? 'Loading from Yahoo Finance...' : 'Load from Yahoo Finance'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Date Range Picker - shown after data is loaded */}
+              {dateRange && selectedDataSource && (
+                <div className="date-range-section" style={{ marginTop: '30px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
+                  <h5>Adjust Date Range (Optional)</h5>
+                  <p style={{ fontSize: '13px', color: '#666', marginBottom: '15px' }}>
+                    Available: {dateRange.min_date} to {dateRange.max_date}
+                  </p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                    <label>
+                      Start Date:
+                      <input
+                        type="date"
+                        min={dateRange.min_date}
+                        max={dateRange.max_date}
+                        defaultValue={dateRange.min_date}
+                        onChange={(e) => {
+                          const endDateInput = document.getElementById('end-date-filter');
+                          if (endDateInput && endDateInput.value) {
+                            handleDateRangeChange(e.target.value, endDateInput.value);
+                          }
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          margin: '5px 0 0 0',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px'
+                        }}
+                      />
+                    </label>
+                    <label>
+                      End Date:
+                      <input
+                        id="end-date-filter"
+                        type="date"
+                        min={dateRange.min_date}
+                        max={dateRange.max_date}
+                        defaultValue={dateRange.max_date}
+                        onChange={(e) => {
+                          const startDateInput = document.querySelector('#end-date-filter').previousElementSibling.previousElementSibling;
+                          if (startDateInput && startDateInput.value) {
+                            handleDateRangeChange(startDateInput.value, e.target.value);
+                          }
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '8px',
+                          margin: '5px 0 0 0',
+                          border: '1px solid #ddd',
+                          borderRadius: '4px'
+                        }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              )}
+
+              {/* Status Messages */}
               {uploadStatus && (
-                <div className={uploadStatus.type === 'success' ? 'success-message' : 'error-message'}>
+                <div
+                  className={uploadStatus.type === 'success' ? 'success-message' : 'error-message'}
+                  style={{ marginTop: '20px' }}
+                >
                   {uploadStatus.message}
                 </div>
               )}

@@ -681,6 +681,215 @@
   color: white;
 }
 
+/* Data Source Selection Cards */
+.data-source-selection {
+  margin-bottom: 20px;
+}
+
+.data-source-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  margin-top: 10px;
+}
+
+.data-source-card {
+  background: #ffffff;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  padding: 24px 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.data-source-card:hover {
+  border-color: #4a90e2;
+  box-shadow: 0 4px 16px rgba(74, 144, 226, 0.2);
+  transform: translateY(-2px);
+}
+
+.data-source-card .card-icon {
+  font-size: 32px;
+  margin-bottom: 12px;
+  display: block;
+}
+
+.data-source-card h5 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+}
+
+.data-source-card p {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: #666;
+  font-weight: 500;
+}
+
+.data-source-card small {
+  font-size: 12px;
+  color: #888;
+  font-style: italic;
+}
+
+/* Selected Data Source Content */
+.selected-data-source {
+  animation: slideInContent 0.3s ease-out;
+}
+
+.data-source-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.data-source-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.back-button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+  color: #666;
+  padding: 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.back-button:hover {
+  background: #f8f9fa;
+  color: #333;
+}
+
+@keyframes slideInContent {
+  from {
+    opacity: 0;
+    transform: translateX(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Dark theme for new components */
+.dark-theme .data-source-card {
+  background: #404258;
+  border-color: #555;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .data-source-card:hover {
+  border-color: #4a90e2;
+  box-shadow: 0 4px 16px rgba(74, 144, 226, 0.3);
+}
+
+.dark-theme .data-source-card h5 {
+  color: white;
+}
+
+.dark-theme .data-source-card p {
+  color: #b0b0b0;
+}
+
+.dark-theme .data-source-card small {
+  color: #888;
+}
+
+.dark-theme .data-source-header {
+  border-bottom-color: #555;
+}
+
+.dark-theme .data-source-header h4 {
+  color: white;
+}
+
+.dark-theme .back-button {
+  color: #b0b0b0;
+}
+
+.dark-theme .back-button:hover {
+  background: #555;
+  color: white;
+}
+
+/* Enhanced upload section styling */
+.selected-data-source .upload-section {
+  background: transparent;
+  border: none;
+  padding: 0;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+.selected-data-source .upload-section p {
+  margin: 20px 0 15px 0;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
+}
+
+/* Improved form styling */
+.yfinance-inputs label {
+  display: block;
+  margin-bottom: 15px;
+  color: #333;
+  font-weight: 500;
+}
+
+.yfinance-inputs .ticker-input {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0 0 0;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: 'SF Mono', 'Monaco', 'Cascadia Code', 'Roboto Mono', monospace;
+  transition: border-color 0.2s ease;
+}
+
+.yfinance-inputs .ticker-input:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+/* Dark theme for form inputs */
+.dark-theme .yfinance-inputs label {
+  color: white;
+}
+
+.dark-theme .yfinance-inputs .ticker-input {
+  background: #404258;
+  border-color: #555;
+  color: white;
+}
+
+.dark-theme .yfinance-inputs .ticker-input:focus {
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+}
+
+.dark-theme .yfinance-inputs .ticker-input::placeholder {
+  color: #888;
+}
+
+.dark-theme .selected-data-source .upload-section p {
+  color: #b0b0b0;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
   .main-content {
@@ -719,5 +928,28 @@
   .data-upload-toggle-btn {
     width: 100%;
     margin-bottom: 10px;
+  }
+
+  .data-source-cards {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .data-source-card {
+    padding: 20px 16px;
+  }
+
+  .data-source-header {
+    flex-direction: row;
+    text-align: center;
+  }
+
+  .data-source-header h4 {
+    font-size: 16px;
+  }
+
+  .back-button {
+    font-size: 14px;
+    padding: 6px;
   }
 }
