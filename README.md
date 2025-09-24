@@ -27,19 +27,46 @@ AlphaQuest is a comprehensive alpha factor research and backtesting platform tha
 
 ## Quick Start
 
-### Frontend (React)
+### Local Development
+
+#### Frontend (React)
 ```bash
 cd frontend
 npm install
 npm start
 ```
 
-### Backend (Python/Flask)
+#### Backend (Django)
 ```bash
 cd backend
 pip install -r requirements.txt
-python app.py
+python manage.py migrate
+python manage.py runserver
 ```
+
+## Deployment
+
+### Render Deployment
+
+AlphaQuest is configured for easy deployment on Render with the included `render.yaml` configuration.
+
+#### Backend Deployment
+1. Connect your GitHub repository to Render
+2. The backend will automatically deploy using:
+   - **Build Command**: `cd backend && pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate`
+   - **Start Command**: `cd backend && gunicorn trading_signals.wsgi:application --bind 0.0.0.0:$PORT`
+
+#### Frontend Deployment
+1. The frontend will build and serve using:
+   - **Build Command**: `cd frontend && npm install && npm run build`
+   - **Start Command**: `cd frontend && npx serve -s build -l $PORT`
+
+#### Environment Variables
+Configure these environment variables in Render Dashboard:
+- `DEBUG=False` (for production)
+- `SECRET_KEY` (generate a secure secret key)
+- `ALLOWED_HOSTS=.onrender.com`
+- `CORS_ALLOWED_ORIGINS` (add your frontend URL)
 
 ## Example Alpha Formulas
 

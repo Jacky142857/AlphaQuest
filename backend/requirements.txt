@@ -9,3 +9,5 @@ scipy
 yfinance
 pymongo
 dnspython
+gunicorn>=20.0.0
+whitenoise>=6.0.0
