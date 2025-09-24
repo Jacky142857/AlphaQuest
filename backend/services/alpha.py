@@ -6,17 +6,21 @@ import re
 
 from django.core.cache import cache
 
-# Import helper functions from utils/helpers.py
-from utils.helpers import (
-    Rank, Delta, Sum, Abs, Sqrt, Ts_argmax, Ts_rank, quantile_transform, trade_when, ts_sum, Returns, hump, ts_delta, bucket, group_neutralize, if_else,
-    # Additional time-series operators
-    ts_arg_min, ts_av_diff, ts_backfill,
-    # Position sizing operators
-    scale,
-    # Arithmetic operators
-    add, densify, divide, inverse, log, max_op, min_op, multiply, power, reverse, sign, signed_power, subtract,
-    # Logical operators
-    and_op, or_op, not_op, is_nan, lt_op, le_op, eq_op, gt_op, ge_op, ne_op
+# Import helper functions from categorized modules
+from utils.arithmetic_operators import (
+    Abs, Sqrt, add, divide, inverse, log, max_op, min_op, multiply, power,
+    reverse, sign, signed_power, subtract, scale
+)
+from utils.conditional_operators import (
+    if_else, trade_when, and_op, or_op, not_op, is_nan, lt_op, le_op, eq_op,
+    gt_op, ge_op, ne_op
+)
+from utils.time_series_operators import (
+    Delta, Sum, Ts_argmax, Ts_rank, ts_sum, Returns, hump, ts_delta,
+    ts_arg_min, ts_av_diff, ts_backfill
+)
+from utils.group_operators import (
+    Rank, quantile_transform, bucket, densify, group_neutralize
 )
 
 # Keys used by your services/state or cache layer (adjust if you use different keys)
