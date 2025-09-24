@@ -1,13 +1,13 @@
-# backend/requirements.txt
+# backend/requirements.txt - Python 3.13 compatible versions
 Django==4.2.16
 djangorestframework==3.14.0
 django-cors-headers==4.3.1
-pandas==2.0.3
-numpy==1.24.4
-sympy==1.12
-scipy==1.10.1
-yfinance==0.2.28
-pymongo==4.6.0
-dnspython==2.4.2
-gunicorn==21.2.0
-whitenoise==6.6.0
+pandas>=2.1.0
+numpy>=1.26.0
+sympy>=1.12
+scipy>=1.11.0
+yfinance>=0.2.28
+pymongo>=4.6.0
+dnspython>=2.4.0
+gunicorn>=21.2.0
+whitenoise>=6.6.0
