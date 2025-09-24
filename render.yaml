@@ -1,37 +1,40 @@
+databases:
+  - name: alphaquest-db
+    plan: free
+    databaseName: alphaquest
+    user: alphaquest
+
 services:
   - type: web
+    plan: free
     name: alphaquest-backend
-    env: python
-    region: oregon
-    buildCommand: |
-      cd backend
-      pip install -r requirements.txt
-      python manage.py collectstatic --noinput
-      python manage.py migrate
-    startCommand: |
-      cd backend
-      gunicorn trading_signals.wsgi:application --bind 0.0.0.0:$PORT
+    runtime: python
+    buildCommand: 'cd backend && ./build.sh'
+    startCommand: 'cd backend && python -m gunicorn trading_signals.wsgi:application'
     envVars:
-      - key: DEBUG
-        value: "False"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: alphaquest-db
+          property: connectionString
       - key: SECRET_KEY
         generateValue: true
+      - key: DEBUG
+        value: "False"
       - key: ALLOWED_HOSTS
         value: ".onrender.com"
       - key: CORS_ALLOWED_ORIGINS
         value: ""  # Add your frontend URL here when deployed
+      - key: WEB_CONCURRENCY
+        value: 4
 
   - type: web
+    plan: free
     name: alphaquest-frontend
-    env: node
-    region: oregon
-    buildCommand: |
-      cd frontend
-      npm install
-      npm run build
-    startCommand: |
-      cd frontend
-      npx serve -s build -l $PORT
+    runtime: node
+    buildCommand: 'cd frontend && npm install && npm run build'
+    startCommand: 'cd frontend && npx serve -s build -p $PORT'
     envVars:
       - key: NODE_ENV
         value: production
+      - key: REACT_APP_API_URL
+        value: https://alphaquest-backend.onrender.com
