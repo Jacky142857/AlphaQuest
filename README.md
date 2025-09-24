@@ -2,6 +2,10 @@
 
 AlphaQuest is a comprehensive alpha factor research and backtesting platform that enables quantitative researchers to develop, test, and analyze trading strategies using mathematical operators and market data.
 
+## 🚀 Live Demo
+
+**Try AlphaQuest now:** [https://alpha-quest.vercel.app/simulate](https://alpha-quest.vercel.app/simulate)
+
 ## Features
 
 ### 🧮 Mathematical Operators
@@ -45,6 +49,10 @@ python manage.py runserver
 ```
 
 ## Deployment
+
+### Live Deployment
+
+AlphaQuest is currently deployed at: **[https://alpha-quest.vercel.app/simulate](https://alpha-quest.vercel.app/simulate)**
 
 ### Render Deployment
 
