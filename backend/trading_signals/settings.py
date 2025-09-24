@@ -74,11 +74,13 @@ REST_FRAMEWORK = {
     ]
 }
 
-# CORS configuration for Render deployment
+# CORS configuration for deployment
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    # Add production frontend URL when deployed
+    # Add Vercel deployment domains
+    "https://alphaquest-frontend.vercel.app",
+    "https://alphaquest.vercel.app",
 ] + [origin.strip() for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if origin.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -94,6 +96,7 @@ else:
     # Production CORS settings
     CORS_ALLOWED_ORIGIN_REGEXES = [
         r"^https://.*\.onrender\.com$",  # Allow Render frontend domains
+        r"^https://.*\.vercel\.app$",    # Allow Vercel frontend domains
     ]
 
 LANGUAGE_CODE = 'en-us'
