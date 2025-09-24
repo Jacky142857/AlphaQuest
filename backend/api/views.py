@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from api.serializers import UploadSerializer, AlphaSerializer, DateRangeSerializer, SettingsSerializer, YFinanceSerializer
-from services.data_loader import upload_single_csv, load_dow30_from_dir, load_yfinance_data
+from api.serializers import UploadSerializer, MultipleUploadSerializer, AlphaSerializer, DateRangeSerializer, SettingsSerializer, YFinanceSerializer
+from services.data_loader import upload_single_csv, upload_multiple_csv, load_dow30_from_dir, load_yfinance_data
 from services.alpha import run_alpha_strategy
 from services.date_filter import set_date_range_for_state
 from services.settings import get_settings, update_settings
@@ -22,6 +22,24 @@ def upload_data(request):
     try:
         rows, columns = upload_single_csv(file)
         return Response({'message': 'Data uploaded successfully', 'rows': rows, 'columns': columns})
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+@csrf_exempt
+@api_view(['POST'])
+def upload_multiple_data(request):
+    """
+    Upload multiple CSV files, each representing a different stock.
+    """
+    # Handle multiple files from FormData
+    files = request.FILES.getlist('files')
+
+    if not files:
+        return Response({'error': 'No files provided'}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        result = upload_multiple_csv(files)
+        return Response(result)
     except Exception as e:
         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 

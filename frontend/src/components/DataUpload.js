@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
-  const [file, setFile] = useState(null);
+  const [files, setFiles] = useState([]);
   const [uploading, setUploading] = useState(false);
   const [uploadStatus, setUploadStatus] = useState(null);
   const [dragOver, setDragOver] = useState(false);
@@ -42,23 +42,79 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
     };
   }, [isOpen, onToggle]);
 
-  const handleFileSelect = (selectedFile) => {
-    if (selectedFile && selectedFile.type === 'text/csv') {
-      setFile(selectedFile);
+  const handleFilesSelect = (selectedFiles) => {
+    const csvFiles = Array.from(selectedFiles).filter(file => file.type === 'text/csv');
+
+    if (csvFiles.length === 0) {
+      setUploadStatus({ type: 'error', message: 'Please select CSV files' });
+      return;
+    }
+
+    if (csvFiles.length !== selectedFiles.length) {
+      setUploadStatus({ type: 'warning', message: `${csvFiles.length} CSV files selected, ${selectedFiles.length - csvFiles.length} non-CSV files ignored` });
+    }
+
+    setFiles(csvFiles);
+    if (csvFiles.length === selectedFiles.length) {
       setUploadStatus(null);
-    } else {
-      setUploadStatus({ type: 'error', message: 'Please select a CSV file' });
     }
   };
 
   const handleFileChange = (e) => {
-    handleFileSelect(e.target.files[0]);
+    handleFilesSelect(e.target.files);
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     setDragOver(false);
-    handleFileSelect(e.dataTransfer.files[0]);
+    const items = Array.from(e.dataTransfer.items);
+    const files = [];
+
+    // Handle both files and folders
+    const processItems = async () => {
+      for (const item of items) {
+        if (item.kind === 'file') {
+          const entry = item.webkitGetAsEntry();
+          if (entry) {
+            if (entry.isFile) {
+              const file = item.getAsFile();
+              if (file.type === 'text/csv' || file.name.endsWith('.csv')) {
+                files.push(file);
+              }
+            } else if (entry.isDirectory) {
+              await processDirectory(entry, files);
+            }
+          }
+        }
+      }
+
+      if (files.length > 0) {
+        setFiles(files);
+        setUploadStatus(null);
+      } else {
+        setUploadStatus({ type: 'error', message: 'No CSV files found in the dropped items' });
+      }
+    };
+
+    processItems();
+  };
+
+  const processDirectory = async (directoryEntry, files) => {
+    return new Promise((resolve) => {
+      const reader = directoryEntry.createReader();
+      reader.readEntries(async (entries) => {
+        for (const entry of entries) {
+          if (entry.isFile && entry.name.endsWith('.csv')) {
+            entry.file((file) => {
+              files.push(file);
+            });
+          } else if (entry.isDirectory) {
+            await processDirectory(entry, files);
+          }
+        }
+        resolve();
+      });
+    });
   };
 
   const handleDragOver = (e) => {
@@ -72,8 +128,8 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
   };
 
   const handleUpload = async () => {
-    if (!file) {
-      setUploadStatus({ type: 'error', message: 'Please select a file first' });
+    if (!files || files.length === 0) {
+      setUploadStatus({ type: 'error', message: 'Please select files first' });
       return;
     }
 
@@ -81,10 +137,12 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
     setUploadStatus(null);
 
     const formData = new FormData();
-    formData.append('file', file);
+    files.forEach((file) => {
+      formData.append('files', file);
+    });
 
     try {
-      const response = await axios.post('/api/upload-data/', formData, {
+      const response = await axios.post('/api/upload-multiple-data/', formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -92,7 +150,7 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
 
       setUploadStatus({
         type: 'success',
-        message: `Data uploaded successfully! ${response.data.rows} rows loaded.`
+        message: `${response.data.stocks_loaded.length} stock files uploaded successfully! Total: ${response.data.total_rows} rows loaded.`
       });
       onDataUploaded();
     } catch (error) {
@@ -244,9 +302,9 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
                       style={{ cursor: 'pointer' }}
                     >
                       <div className="card-icon">📁</div>
-                      <h5>Upload CSV File</h5>
-                      <p>Upload your own data file</p>
-                      <small>OHLCV format required</small>
+                      <h5>Upload CSV Files</h5>
+                      <p>Upload multiple stock files or a folder</p>
+                      <small>Each file = 1 stock, OHLCV format</small>
                     </div>
 
                     {/* Dow Jones 30 Card */}
@@ -294,7 +352,7 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
                       ← Back
                     </button>
                     <h4 style={{ margin: 0, flex: 1, textAlign: 'center' }}>
-                      {selectedDataSource === 'csv' && 'Upload CSV File'}
+                      {selectedDataSource === 'csv' && 'Upload CSV Files'}
                       {selectedDataSource === 'dow30' && 'Dow Jones 30 Data'}
                       {selectedDataSource === 'yfinance' && 'Yahoo Finance Data'}
                     </h4>
@@ -305,7 +363,7 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
                   {selectedDataSource === 'csv' && (
                     <div className="upload-section">
                       <p style={{ fontSize: '14px', color: '#666', margin: '20px 0 15px 0' }}>
-                        Upload a CSV file with your stock data. Required columns: Open, High, Low, Close, Volume
+                        Upload multiple CSV files or drag a folder. Each file should represent one stock with columns: Open, High, Low, Close, Volume
                       </p>
 
                       <div
@@ -317,23 +375,103 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
                       >
                         <div className="upload-icon">📁</div>
                         <div className="upload-text">
-                          {file ? file.name : 'Drop your CSV file here or click to browse'}
+                          {files.length > 0
+                            ? `${files.length} CSV file${files.length > 1 ? 's' : ''} selected`
+                            : 'Drop CSV files or folder here, or click to browse'}
                         </div>
                         <input
                           id="file-input"
                           type="file"
                           accept=".csv"
+                          multiple
+                          webkitdirectory=""
                           onChange={handleFileChange}
                           className="file-input"
                         />
                       </div>
 
+                      <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+                        <button
+                          style={{
+                            padding: '8px 16px',
+                            background: '#f8f9fa',
+                            border: '1px solid #dee2e6',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '14px'
+                          }}
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.multiple = true;
+                            input.accept = '.csv';
+                            input.onchange = (e) => handleFilesSelect(e.target.files);
+                            input.click();
+                          }}
+                        >
+                          📄 Select Files
+                        </button>
+                        <button
+                          style={{
+                            padding: '8px 16px',
+                            background: '#f8f9fa',
+                            border: '1px solid #dee2e6',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontSize: '14px'
+                          }}
+                          onClick={() => {
+                            const input = document.createElement('input');
+                            input.type = 'file';
+                            input.webkitdirectory = true;
+                            input.onchange = (e) => handleFilesSelect(e.target.files);
+                            input.click();
+                          }}
+                        >
+                          📁 Select Folder
+                        </button>
+                      </div>
+
+                      {files.length > 0 && (
+                        <div style={{ maxHeight: '120px', overflowY: 'auto', marginBottom: '15px' }}>
+                          <small style={{ color: '#666', display: 'block', marginBottom: '5px' }}>
+                            Selected files:
+                          </small>
+                          {files.map((file, index) => (
+                            <div key={index} style={{
+                              fontSize: '12px',
+                              color: '#333',
+                              padding: '2px 0',
+                              display: 'flex',
+                              justifyContent: 'space-between'
+                            }}>
+                              <span>{file.name}</span>
+                              <button
+                                onClick={() => {
+                                  const newFiles = files.filter((_, i) => i !== index);
+                                  setFiles(newFiles);
+                                }}
+                                style={{
+                                  background: 'none',
+                                  border: 'none',
+                                  color: '#dc3545',
+                                  cursor: 'pointer',
+                                  fontSize: '12px'
+                                }}
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
                       <button
                         className="upload-button"
                         onClick={handleUpload}
-                        disabled={!file || uploading}
+                        disabled={files.length === 0 || uploading}
                       >
-                        {uploading ? 'Uploading...' : 'Upload File'}
+                        {uploading ? 'Uploading...' : `Upload ${files.length} File${files.length !== 1 ? 's' : ''}`}
                       </button>
                     </div>
                   )}

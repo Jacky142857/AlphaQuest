@@ -3,6 +3,13 @@ from rest_framework import serializers
 class UploadSerializer(serializers.Serializer):
     file = serializers.FileField()
 
+class MultipleUploadSerializer(serializers.Serializer):
+    files = serializers.ListField(
+        child=serializers.FileField(),
+        min_length=1,
+        help_text="List of CSV files, each representing a stock"
+    )
+
 class AlphaSerializer(serializers.Serializer):
     alpha_formula = serializers.CharField()
 

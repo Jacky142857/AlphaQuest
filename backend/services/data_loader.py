@@ -23,6 +23,111 @@ def upload_single_csv(file_obj):
     cache.set(DATA_CACHE_KEY, df, None)
     return len(df), list(df.columns)
 
+def upload_multiple_csv(file_objects):
+    """
+    Upload multiple CSV files, each representing a different stock.
+
+    Parameters:
+    - file_objects: list of file objects
+
+    Returns:
+    - dict with upload results
+    """
+    if not file_objects:
+        raise ValueError("At least one file is required")
+
+    multi_data = {}
+    failed_files = []
+    total_rows = 0
+    required_columns = ['Open', 'High', 'Low', 'Close', 'Volume']
+
+    for file_obj in file_objects:
+        try:
+            df = pd.read_csv(file_obj)
+
+            # Check for required columns
+            missing = [c for c in required_columns if c not in df.columns]
+            if missing:
+                failed_files.append({
+                    'filename': file_obj.name,
+                    'error': f"Missing columns: {missing}"
+                })
+                continue
+
+            # Process Date column
+            if 'Date' in df.columns:
+                df['Date'] = pd.to_datetime(df['Date'])
+                df.set_index('Date', inplace=True)
+
+            # Remove any rows with NaN values
+            df = df.dropna()
+
+            if df.empty:
+                failed_files.append({
+                    'filename': file_obj.name,
+                    'error': "No valid data after cleaning"
+                })
+                continue
+
+            # Extract stock symbol from filename
+            filename = file_obj.name
+            # Remove common suffixes to get stock symbol
+            symbol = filename.replace('_data.csv', '').replace('.csv', '').replace('_', '').upper()
+
+            # Ensure unique symbol names
+            original_symbol = symbol
+            counter = 1
+            while symbol in multi_data:
+                symbol = f"{original_symbol}_{counter}"
+                counter += 1
+
+            multi_data[symbol] = df
+            total_rows += len(df)
+
+        except Exception as e:
+            failed_files.append({
+                'filename': file_obj.name,
+                'error': str(e)
+            })
+
+    if not multi_data:
+        error_msg = "No valid CSV files could be processed"
+        if failed_files:
+            error_msg += f". Failed files: {[f['filename'] for f in failed_files]}"
+        raise ValueError(error_msg)
+
+    # Store in cache
+    cache.set(MULTI_DATA_CACHE_KEY, multi_data, None)
+
+    # Compute available date range from loaded data
+    date_sets = [set(df.index) for df in multi_data.values()]
+    common_dates = set.intersection(*date_sets)
+
+    if not common_dates:
+        # If no common dates, use the union of all dates
+        all_dates = set.union(*date_sets)
+        min_date, max_date = min(all_dates), max(all_dates)
+    else:
+        min_date, max_date = min(common_dates), max(common_dates)
+
+    result = {
+        'message': f'Successfully uploaded {len(multi_data)} stock files',
+        'stocks_loaded': list(multi_data.keys()),
+        'total_rows': total_rows,
+        'date_range': {
+            'min_date': min_date.strftime('%Y-%m-%d'),
+            'max_date': max_date.strftime('%Y-%m-%d')
+        },
+        'total_files_processed': len(file_objects),
+        'successful_files': len(multi_data),
+        'failed_files': len(failed_files)
+    }
+
+    if failed_files:
+        result['failed_file_details'] = failed_files
+
+    return result
+
 def load_dow30_from_dir(data_dir):
     if not os.path.exists(data_dir):
         raise FileNotFoundError("Data directory not found")
