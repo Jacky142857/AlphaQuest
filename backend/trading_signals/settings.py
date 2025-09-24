@@ -83,7 +83,7 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     # Add Vercel deployment domains
-    "https://alpha-quest.vercel.app/",
+    "https://alpha-quest.vercel.app",
 ] + [origin.strip() for origin in os.environ.get('CORS_ALLOWED_ORIGINS', '').split(',') if origin.strip()]
 
 CORS_ALLOW_CREDENTIALS = True
