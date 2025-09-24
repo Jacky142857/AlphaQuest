@@ -72,7 +72,7 @@ const MyAlphas = () => {
   };
 
   const formatReturn = (value) => {
-    if (typeof value !== 'number') return 'N/A';
+    if (value === null || value === undefined || typeof value !== 'number' || isNaN(value)) return 'N/A';
     return `${(value * 100).toFixed(2)}%`;
   };
 

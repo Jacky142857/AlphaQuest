@@ -30,7 +30,11 @@ const AlphaFormula = ({ onResult, isDataUploaded, setLoading, strategySettings, 
         settings: strategySettings
       });
 
-      onResult(response.data);
+      // Include the formula with the result
+      onResult({
+        ...response.data,
+        formula: formula
+      });
       setError(null);
     } catch (error) {
       setError(error.response?.data?.error || 'Calculation failed');

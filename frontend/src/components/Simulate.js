@@ -41,14 +41,28 @@ function Simulate() {
     setPnlData(result.pnl_data);
     setMetrics(result.metrics);
 
+    // Transform backend response to match MyAlphas expected structure
+    const transformedReturns = result.metrics ? {
+      totalReturn: result.metrics.total_return,
+      annualizedReturn: null, // Not provided by backend yet
+      volatility: null        // Not provided by backend yet
+    } : null;
+
+    const transformedMetrics = result.metrics ? {
+      sharpeRatio: null,      // Not provided by backend yet
+      maxDrawdown: null,      // Not provided by backend yet
+      winRate: null          // Not provided by backend yet
+    } : null;
+
     // Store current alpha data for potential saving
     setCurrentAlphaData({
-      formula: result.formula,
+      formula: result.formula, // Now available from AlphaFormula component
       settings: strategySettings,
-      dataSource: result.dataSource,
-      dateRange: result.dateRange,
-      returns: result.returns,
-      metrics: result.metrics
+      dataSource: { type: 'Unknown' }, // TODO: Get from data upload context
+      dateRange: { start: null, end: null }, // TODO: Get from data context
+      returns: transformedReturns,
+      metrics: transformedMetrics,
+      rawResult: result // Store the raw result for reference
     });
   };
 
