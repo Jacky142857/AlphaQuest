@@ -6,3 +6,4 @@ pandas
 numpy
 sympy
 scipy
+yfinance

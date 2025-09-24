@@ -10,6 +10,12 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
   const [loadingDow30, setLoadingDow30] = useState(false);
   const [dateRange, setDateRange] = useState(null);
 
+  // YFinance state
+  const [loadingYFinance, setLoadingYFinance] = useState(false);
+  const [tickers, setTickers] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
   // Handle escape key to close modal
   useEffect(() => {
     const handleEscape = (e) => {
@@ -135,6 +141,64 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
     }
   };
 
+  const handleLoadYFinance = async () => {
+    if (!tickers.trim() || !startDate || !endDate) {
+      setUploadStatus({
+        type: 'error',
+        message: 'Please provide tickers, start date, and end date'
+      });
+      return;
+    }
+
+    setLoadingYFinance(true);
+    setUploadStatus(null);
+
+    // Parse tickers - split by comma and clean up
+    const tickerList = tickers.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
+
+    try {
+      const response = await axios.post('/api/load-yfinance/', {
+        tickers: tickerList,
+        start_date: startDate,
+        end_date: endDate
+      });
+
+      let message = `${response.data.stocks_loaded.length} stocks loaded from Yahoo Finance! `;
+      message += `Date range: ${response.data.date_range.min_date} to ${response.data.date_range.max_date}`;
+
+      if (response.data.failed_tickers && response.data.failed_tickers.length > 0) {
+        message += `\nWarning: Failed to load ${response.data.failed_tickers.join(', ')}`;
+      }
+
+      setUploadStatus({
+        type: 'success',
+        message: message
+      });
+
+      setDateRange(response.data.date_range);
+      onDataUploaded();
+    } catch (error) {
+      setUploadStatus({
+        type: 'error',
+        message: error.response?.data?.error || 'Failed to load data from Yahoo Finance'
+      });
+    } finally {
+      setLoadingYFinance(false);
+    }
+  };
+
+  // Set default dates on component mount
+  useEffect(() => {
+    if (!startDate && !endDate) {
+      const today = new Date();
+      const oneYearAgo = new Date(today);
+      oneYearAgo.setFullYear(today.getFullYear() - 1);
+
+      setEndDate(today.toISOString().split('T')[0]);
+      setStartDate(oneYearAgo.toISOString().split('T')[0]);
+    }
+  }, [startDate, endDate]);
+
   return (
     <>
       <button className="data-upload-toggle-btn" onClick={onToggle}>
@@ -197,6 +261,80 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
           disabled={loadingDow30}
         >
           {loadingDow30 ? 'Loading...' : 'Load Dow Jones 30'}
+        </button>
+      </div>
+
+      {/* Yahoo Finance Data */}
+      <div className="upload-section" style={{ marginTop: '20px' }}>
+        <h4>Or Load Data from Yahoo Finance</h4>
+        <p style={{ fontSize: '14px', color: '#666', margin: '10px 0' }}>
+          Enter stock tickers separated by commas (e.g., AAPL, GOOGL, MSFT) and select a date range
+        </p>
+
+        <div className="yfinance-inputs">
+          <label>
+            Stock Tickers:
+            <input
+              type="text"
+              value={tickers}
+              onChange={(e) => setTickers(e.target.value)}
+              placeholder="AAPL, GOOGL, MSFT, TSLA"
+              className="ticker-input"
+              style={{
+                width: '100%',
+                padding: '8px',
+                margin: '5px 0 15px 0',
+                border: '1px solid #ddd',
+                borderRadius: '4px',
+                fontSize: '14px'
+              }}
+            />
+          </label>
+
+          <div className="date-inputs" style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+            <label style={{ flex: 1 }}>
+              Start Date:
+              <input
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  margin: '5px 0',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+              />
+            </label>
+            <label style={{ flex: 1 }}>
+              End Date:
+              <input
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  margin: '5px 0',
+                  border: '1px solid #ddd',
+                  borderRadius: '4px'
+                }}
+              />
+            </label>
+          </div>
+        </div>
+
+        <button
+          className="upload-button yfinance-button"
+          onClick={handleLoadYFinance}
+          disabled={loadingYFinance || !tickers.trim() || !startDate || !endDate}
+          style={{
+            backgroundColor: loadingYFinance || !tickers.trim() || !startDate || !endDate ? '#ccc' : '#007bff',
+            cursor: loadingYFinance || !tickers.trim() || !startDate || !endDate ? 'not-allowed' : 'pointer'
+          }}
+        >
+          {loadingYFinance ? 'Loading from Yahoo Finance...' : 'Load from Yahoo Finance'}
         </button>
       </div>
 

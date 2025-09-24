@@ -23,3 +23,12 @@ class SettingsSerializer(serializers.Serializer):
     minWeight = serializers.FloatField(required=False)
     maxWeight = serializers.FloatField(required=False)
     rebalanceFreq = serializers.CharField(required=False)
+
+class YFinanceSerializer(serializers.Serializer):
+    tickers = serializers.ListField(
+        child=serializers.CharField(max_length=10),
+        min_length=1,
+        help_text="List of stock ticker symbols (e.g., ['AAPL', 'GOOGL', 'MSFT'])"
+    )
+    start_date = serializers.DateField(help_text="Start date in YYYY-MM-DD format")
+    end_date = serializers.DateField(help_text="End date in YYYY-MM-DD format")

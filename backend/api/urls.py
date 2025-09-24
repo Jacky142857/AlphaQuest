@@ -5,6 +5,7 @@ from . import views
 urlpatterns = [
     path('upload-data/', views.upload_data, name='upload_data'),
     path('load-dow30/', views.load_dow30_data, name='load_dow30_data'),
+    path('load-yfinance/', views.load_yfinance_data_view, name='load_yfinance_data'),
     path('set-date-range/', views.set_date_range, name='set_date_range'),
     path('calculate-alpha/', views.calculate_alpha, name='calculate_alpha'),
     path('update-settings/', views.update_settings_view, name='update_settings'),

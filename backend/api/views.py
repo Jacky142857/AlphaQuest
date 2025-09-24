@@ -3,8 +3,8 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 
-from api.serializers import UploadSerializer, AlphaSerializer, DateRangeSerializer, SettingsSerializer
-from services.data_loader import upload_single_csv, load_dow30_from_dir
+from api.serializers import UploadSerializer, AlphaSerializer, DateRangeSerializer, SettingsSerializer, YFinanceSerializer
+from services.data_loader import upload_single_csv, load_dow30_from_dir, load_yfinance_data
 from services.alpha import run_alpha_strategy
 from services.date_filter import set_date_range_for_state
 from services.settings import get_settings, update_settings
@@ -77,3 +77,30 @@ def update_settings_view(request):
 @api_view(['GET'])
 def get_settings_view(request):
     return Response({'settings': get_settings()})
+
+@csrf_exempt
+@api_view(['POST'])
+def load_yfinance_data_view(request):
+    """
+    Load stock data from Yahoo Finance.
+
+    Expected request data:
+    {
+        "tickers": ["AAPL", "GOOGL", "MSFT"],
+        "start_date": "2023-01-01",
+        "end_date": "2023-12-31"
+    }
+    """
+    serializer = YFinanceSerializer(data=request.data)
+    if not serializer.is_valid():
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    tickers = serializer.validated_data['tickers']
+    start_date = serializer.validated_data['start_date'].strftime('%Y-%m-%d')
+    end_date = serializer.validated_data['end_date'].strftime('%Y-%m-%d')
+
+    try:
+        result = load_yfinance_data(tickers, start_date, end_date)
+        return Response(result)
+    except Exception as e:
+        return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
