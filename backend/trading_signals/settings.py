@@ -127,6 +127,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # MongoDB Configuration
 MONGODB_SETTINGS = {
     'db': 'alpha_quest',
-    'host': 'mongodb+srv://jacky:Anotherdayofsun142@cluster0.94baind.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+    'host': os.environ.get('MONGODB_URL', 'mongodb+srv://jacky:Anotherdayofsun142@cluster0.94baind.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0'),
     'alias': 'default'
 }
