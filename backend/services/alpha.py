@@ -193,6 +193,10 @@ def process_alpha_strategy(df: pd.DataFrame, alpha_formula_str: str, settings: d
         'subtract': subtract,
         'bucket': bucket,
         'group_neutralize': group_neutralize,
+        # quantile driver parameters
+        'gaussian': 'gaussian',
+        'uniform': 'uniform',
+        'cauchy': 'cauchy',
         # convenience
         'pd': pd,
         'np': np
@@ -316,12 +320,28 @@ def process_alpha_strategy(df: pd.DataFrame, alpha_formula_str: str, settings: d
 
     # Clean up and produce final metrics
     strategy_returns = strategy_returns.dropna()
+
+    # Ensure strategy_returns is numeric
+    if not pd.api.types.is_numeric_dtype(strategy_returns):
+        try:
+            strategy_returns = pd.to_numeric(strategy_returns, errors='coerce')
+            strategy_returns = strategy_returns.dropna()
+        except Exception as e:
+            print(f"Warning: Could not convert strategy_returns to numeric: {e}")
+
     if len(strategy_returns) == 0:
         raise Exception("No valid returns calculated - check data quality and alpha formula")
 
     # Additional validation
-    if np.isinf(strategy_returns).any():
-        print("Warning: Infinite values detected in strategy returns, replacing with 0")
+    try:
+        if pd.api.types.is_numeric_dtype(strategy_returns) and np.isinf(strategy_returns).any():
+            print("Warning: Infinite values detected in strategy returns, replacing with 0")
+            strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
+        elif strategy_returns.isin([np.inf, -np.inf]).any():
+            print("Warning: Infinite values detected in strategy returns, replacing with 0")
+            strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
+    except (TypeError, ValueError):
+        # If there are data type issues, try pandas replace method directly
         strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
 
     if strategy_returns.abs().max() > 1.0:
@@ -456,6 +476,10 @@ def process_alpha_strategy_multi(multi_stock_data: dict, alpha_formula_str: str,
         'subtract': subtract,
         'bucket': bucket,
         'group_neutralize': group_neutralize,
+        # quantile driver parameters
+        'gaussian': 'gaussian',
+        'uniform': 'uniform',
+        'cauchy': 'cauchy',
         'pd': pd,
         'np': np
     }
@@ -546,8 +570,15 @@ def process_alpha_strategy_multi(multi_stock_data: dict, alpha_formula_str: str,
             raise Exception("No valid returns calculated")
 
         # Validation consistent with other calculation paths
-        if np.isinf(strategy_returns).any():
-            print("Warning: Infinite values detected in equal-weight returns, replacing with 0")
+        try:
+            if pd.api.types.is_numeric_dtype(strategy_returns) and np.isinf(strategy_returns).any():
+                print("Warning: Infinite values detected in equal-weight returns, replacing with 0")
+                strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
+            elif strategy_returns.isin([np.inf, -np.inf]).any():
+                print("Warning: Infinite values detected in equal-weight returns, replacing with 0")
+                strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
+        except (TypeError, ValueError):
+            # If there are data type issues, try pandas replace method directly
             strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
 
         cumulative_returns = (1 + strategy_returns).cumprod()
@@ -649,12 +680,28 @@ def process_alpha_strategy_multi(multi_stock_data: dict, alpha_formula_str: str,
             raise Exception("Unhandled alpha type in multi-stock processing")
 
     strategy_returns = strategy_returns.dropna()
+
+    # Ensure strategy_returns is numeric
+    if not pd.api.types.is_numeric_dtype(strategy_returns):
+        try:
+            strategy_returns = pd.to_numeric(strategy_returns, errors='coerce')
+            strategy_returns = strategy_returns.dropna()
+        except Exception as e:
+            print(f"Warning: Could not convert strategy_returns to numeric: {e}")
+
     if len(strategy_returns) == 0:
         raise Exception("No valid returns calculated - check data quality and alpha formula")
 
     # Additional validation for multi-stock case
-    if np.isinf(strategy_returns).any():
-        print("Warning: Infinite values detected in strategy returns, replacing with 0")
+    try:
+        if pd.api.types.is_numeric_dtype(strategy_returns) and np.isinf(strategy_returns).any():
+            print("Warning: Infinite values detected in strategy returns, replacing with 0")
+            strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
+        elif strategy_returns.isin([np.inf, -np.inf]).any():
+            print("Warning: Infinite values detected in strategy returns, replacing with 0")
+            strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
+    except (TypeError, ValueError):
+        # If there are data type issues, try pandas replace method directly
         strategy_returns = strategy_returns.replace([np.inf, -np.inf], 0)
 
     if strategy_returns.abs().max() > 1.0:
