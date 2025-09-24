@@ -1,8 +1,10 @@
 // frontend/src/components/Settings.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNotification } from '../contexts/NotificationContext';
 import './Settings.css';
 
 const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
+  const { showNotification } = useNotification();
   const [settings, setSettings] = useState({
     neutralization: false,
     decay: 0,
@@ -17,6 +19,25 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
     maxWeight: 0.05,
     rebalanceFreq: 'Daily'
   });
+
+  // Handle escape key to close modal
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        onToggle();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'hidden'; // Prevent background scrolling
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscape);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onToggle]);
 
   const handleSettingChange = (key, value) => {
     const newSettings = { ...settings, [key]: value };
@@ -41,28 +62,27 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
         // Close the settings window
         onToggle();
 
-        // Show success alert
-        alert('Settings applied successfully!');
+        // Show custom success notification
+        showNotification('Settings applied successfully! Your strategy configuration has been updated.', 'success', 5000);
       } else {
         console.error('Failed to update settings');
-        alert('Failed to update settings. Please try again.');
+        showNotification('Failed to update settings. Please try again.', 'error', 6000);
       }
     } catch (error) {
       console.error('Error updating settings:', error);
-      alert('Error updating settings. Please check your connection.');
+      showNotification('Error updating settings. Please check your connection and try again.', 'error', 6000);
     }
   };
 
-  if (!isOpen) {
-    return (
+  return (
+    <>
       <button className="settings-toggle-btn" onClick={onToggle}>
         ⚙️ Settings
       </button>
-    );
-  }
 
-  return (
-    <div className="settings-panel">
+      {isOpen && (
+        <div className="settings-overlay" onClick={onToggle}>
+          <div className="settings-modal" onClick={(e) => e.stopPropagation()}>
       <div className="settings-header">
         <h3>Strategy Settings</h3>
         <button className="settings-close-btn" onClick={onToggle}>×</button>
@@ -282,7 +302,10 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
           Apply
         </button>
       </div>
-    </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
