@@ -1,6 +1,7 @@
 // frontend/src/components/AlphaFormula.js
 import React, { useState } from 'react';
 import axios from 'axios';
+import { createApiUrl } from '../config/api';
 import AlphaFormulaEditor from './AlphaFormulaEditor';
 import './AlphaFormulaEditor.css';
 
@@ -25,7 +26,7 @@ const AlphaFormula = ({ onResult, isDataUploaded, setLoading, strategySettings, 
     setError(null);
 
     try {
-      const response = await axios.post('/api/calculate-alpha/', {
+      const response = await axios.post(createApiUrl('/api/calculate-alpha/'), {
         alpha_formula: formula,
         settings: strategySettings
       });

@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNotification } from './NotificationContext';
+import { createApiUrl } from '../config/api';
 
 const AuthContext = createContext();
 
@@ -24,7 +25,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await axios.get('/api/auth/user/', {
+        const response = await axios.get(createApiUrl('/api/auth/user/'), {
           withCredentials: true
         });
 
@@ -46,7 +47,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (username, password) => {
     try {
-      const response = await axios.post('/api/auth/login/', {
+      const response = await axios.post(createApiUrl('/api/auth/login/'), {
         username,
         password
       }, {
@@ -68,7 +69,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (username, email, password, confirmPassword) => {
     try {
-      const response = await axios.post('/api/auth/register/', {
+      const response = await axios.post(createApiUrl('/api/auth/register/'), {
         username,
         email,
         password,
@@ -94,7 +95,7 @@ export const AuthProvider = ({ children }) => {
 
   const logout = async () => {
     try {
-      await axios.post('/api/auth/logout/', {}, {
+      await axios.post(createApiUrl('/api/auth/logout/'), {}, {
         withCredentials: true
       });
     } catch (error) {
@@ -127,7 +128,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      const response = await axios.post('/api/alphas/save/', {
+      const response = await axios.post(createApiUrl('/api/alphas/save/'), {
         name: alphaData.name || `Alpha ${user.alphas?.length + 1 || 1}`,
         formula: alphaData.formula,
         settings: alphaData.settings,
@@ -163,7 +164,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      await axios.delete(`/api/alphas/${alphaId}/delete/`, {
+      await axios.delete(createApiUrl(`/api/alphas/${alphaId}/delete/`), {
         withCredentials: true
       });
 
@@ -189,7 +190,7 @@ export const AuthProvider = ({ children }) => {
     }
 
     try {
-      await axios.put(`/api/alphas/${alphaId}/update/`, updatedData, {
+      await axios.put(createApiUrl(`/api/alphas/${alphaId}/update/`), updatedData, {
         withCredentials: true
       });
 

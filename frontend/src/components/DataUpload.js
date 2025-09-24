@@ -1,6 +1,7 @@
 // frontend/src/components/DataUpload.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { createApiUrl } from '../config/api';
 
 const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
   const [files, setFiles] = useState([]);
@@ -142,7 +143,7 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
     });
 
     try {
-      const response = await axios.post('/api/upload-multiple-data/', formData, {
+      const response = await axios.post(createApiUrl('/api/upload-multiple-data/'), formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -168,7 +169,7 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
     setUploadStatus(null);
 
     try {
-      const response = await axios.post('/api/load-dow30/');
+      const response = await axios.post(createApiUrl('/api/load-dow30/'));
 
       setUploadStatus({
         type: 'success',
@@ -189,7 +190,7 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
 
   const handleDateRangeChange = async (startDate, endDate) => {
     try {
-      const response = await axios.post('/api/set-date-range/', {
+      const response = await axios.post(createApiUrl('/api/set-date-range/'), {
         start_date: startDate,
         end_date: endDate
       });
@@ -222,7 +223,7 @@ const DataUpload = ({ onDataUploaded, isOpen, onToggle }) => {
     const tickerList = tickers.split(',').map(t => t.trim().toUpperCase()).filter(t => t);
 
     try {
-      const response = await axios.post('/api/load-yfinance/', {
+      const response = await axios.post(createApiUrl('/api/load-yfinance/'), {
         tickers: tickerList,
         start_date: startDate,
         end_date: endDate
