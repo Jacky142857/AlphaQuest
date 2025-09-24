@@ -1,5 +1,6 @@
 // frontend/src/contexts/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNotification } from './NotificationContext';
 
 const AuthContext = createContext();
@@ -16,108 +17,93 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isGuest, setIsGuest] = useState(true);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const { showNotification } = useNotification();
 
-  // Load authentication state from localStorage on mount
+  // Check authentication status on mount
   useEffect(() => {
-    const savedAuth = localStorage.getItem('alpha_quest_auth');
-    if (savedAuth) {
+    const checkAuthStatus = async () => {
       try {
-        const authData = JSON.parse(savedAuth);
-        if (authData.user) {
-          setUser(authData.user);
+        const response = await axios.get('/api/auth/user/', {
+          withCredentials: true
+        });
+
+        if (response.data.user) {
+          setUser(response.data.user);
           setIsGuest(false);
         }
       } catch (error) {
-        console.error('Error loading auth data:', error);
-        localStorage.removeItem('alpha_quest_auth');
+        // User is not authenticated or session expired
+        setUser(null);
+        setIsGuest(true);
+      } finally {
+        setLoading(false);
       }
-    }
+    };
+
+    checkAuthStatus();
   }, []);
 
-  // Save authentication state to localStorage
-  const saveAuthState = (userData) => {
-    const authData = {
-      user: userData,
-      timestamp: Date.now(),
-    };
-    localStorage.setItem('alpha_quest_auth', JSON.stringify(authData));
-  };
+  const login = async (username, password) => {
+    try {
+      const response = await axios.post('/api/auth/login/', {
+        username,
+        password
+      }, {
+        withCredentials: true
+      });
 
-  const login = (username, password) => {
-    // Simple authentication (later replace with real backend)
-    if (username && password.length >= 6) {
-      const userData = {
-        id: `user_${Date.now()}`,
-        username: username,
-        email: `${username}@example.com`,
-        createdAt: new Date().toISOString(),
-        alphas: [],
-      };
-
-      setUser(userData);
-      setIsGuest(false);
-      saveAuthState(userData);
-      setIsLoginModalOpen(false);
-
-      showNotification(`Welcome back, ${username}! You can now save your alpha strategies.`, 'success', 5000);
-      return { success: true };
-    } else {
-      return { success: false, error: 'Username is required and password must be at least 6 characters' };
+      if (response.data.user) {
+        setUser(response.data.user);
+        setIsGuest(false);
+        setIsLoginModalOpen(false);
+        showNotification(`Welcome back, ${username}! You can now save your alpha strategies.`, 'success', 5000);
+        return { success: true };
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Login failed';
+      return { success: false, error: errorMessage };
     }
   };
 
-  const register = (username, email, password, confirmPassword) => {
-    // Simple registration validation
-    if (!username || !email || !password) {
-      return { success: false, error: 'All fields are required' };
+  const register = async (username, email, password, confirmPassword) => {
+    try {
+      const response = await axios.post('/api/auth/register/', {
+        username,
+        email,
+        password,
+        confirm_password: confirmPassword
+      }, {
+        withCredentials: true
+      });
+
+      if (response.data.user) {
+        setUser(response.data.user);
+        setIsGuest(false);
+        setIsLoginModalOpen(false);
+        showNotification(`Account created successfully! Welcome, ${username}!`, 'success', 5000);
+        return { success: true };
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.error ||
+                           Object.values(error.response?.data || {}).flat().join(', ') ||
+                           'Registration failed';
+      return { success: false, error: errorMessage };
     }
-
-    if (password !== confirmPassword) {
-      return { success: false, error: 'Passwords do not match' };
-    }
-
-    if (password.length < 6) {
-      return { success: false, error: 'Password must be at least 6 characters' };
-    }
-
-    if (!email.includes('@')) {
-      return { success: false, error: 'Please enter a valid email address' };
-    }
-
-    // Check if user already exists (simple localStorage check)
-    const existingUsers = JSON.parse(localStorage.getItem('alpha_quest_users') || '[]');
-    if (existingUsers.some(u => u.username === username || u.email === email)) {
-      return { success: false, error: 'Username or email already exists' };
-    }
-
-    const userData = {
-      id: `user_${Date.now()}`,
-      username: username,
-      email: email,
-      createdAt: new Date().toISOString(),
-      alphas: [],
-    };
-
-    // Save to users list
-    existingUsers.push(userData);
-    localStorage.setItem('alpha_quest_users', JSON.stringify(existingUsers));
-
-    // Set as current user
-    setUser(userData);
-    setIsGuest(false);
-    saveAuthState(userData);
-    setIsLoginModalOpen(false);
-
-    showNotification(`Account created successfully! Welcome, ${username}!`, 'success', 5000);
-    return { success: true };
   };
 
-  const logout = () => {
-    setUser(null);
-    setIsGuest(true);
-    localStorage.removeItem('alpha_quest_auth');
-    showNotification('Logged out successfully. You are now in guest mode.', 'info', 4000);
+  const logout = async () => {
+    try {
+      await axios.post('/api/auth/logout/', {}, {
+        withCredentials: true
+      });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      setUser(null);
+      setIsGuest(true);
+      showNotification('Logged out successfully. You are now in guest mode.', 'info', 4000);
+    }
   };
 
   const continueAsGuest = () => {
@@ -134,78 +120,103 @@ export const AuthProvider = ({ children }) => {
     setIsLoginModalOpen(false);
   };
 
-  const saveAlpha = (alphaData) => {
+  const saveAlpha = async (alphaData) => {
     if (isGuest || !user) {
       showNotification('Please login to save your alpha strategies.', 'warning', 5000);
       return false;
     }
 
-    const newAlpha = {
-      id: `alpha_${Date.now()}`,
-      name: alphaData.name || `Alpha ${user.alphas.length + 1}`,
-      formula: alphaData.formula,
-      settings: alphaData.settings,
-      dataSource: alphaData.dataSource,
-      dateRange: alphaData.dateRange,
-      returns: alphaData.returns,
-      metrics: alphaData.metrics,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      const response = await axios.post('/api/alphas/save/', {
+        name: alphaData.name || `Alpha ${user.alphas?.length + 1 || 1}`,
+        formula: alphaData.formula,
+        settings: alphaData.settings,
+        dataSource: alphaData.dataSource,
+        dateRange: alphaData.dateRange,
+        returns: alphaData.returns,
+        metrics: alphaData.metrics
+      }, {
+        withCredentials: true
+      });
 
-    const updatedUser = {
-      ...user,
-      alphas: [...user.alphas, newAlpha],
-    };
+      if (response.data.alpha) {
+        // Update user state with new alpha
+        const updatedUser = {
+          ...user,
+          alphas: [...(user.alphas || []), response.data.alpha]
+        };
+        setUser(updatedUser);
 
-    setUser(updatedUser);
-    saveAuthState(updatedUser);
-
-    showNotification(`Alpha "${newAlpha.name}" saved successfully!`, 'success', 4000);
-    return true;
+        showNotification(`Alpha "${response.data.alpha.name}" saved successfully!`, 'success', 4000);
+        return true;
+      }
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Failed to save alpha';
+      showNotification(errorMessage, 'error', 5000);
+      return false;
+    }
   };
 
-  const deleteAlpha = (alphaId) => {
+  const deleteAlpha = async (alphaId) => {
     if (isGuest || !user) {
       return false;
     }
 
-    const updatedUser = {
-      ...user,
-      alphas: user.alphas.filter(alpha => alpha.id !== alphaId),
-    };
+    try {
+      await axios.delete(`/api/alphas/${alphaId}/delete/`, {
+        withCredentials: true
+      });
 
-    setUser(updatedUser);
-    saveAuthState(updatedUser);
+      // Update user state by removing the alpha
+      const updatedUser = {
+        ...user,
+        alphas: user.alphas.filter(alpha => alpha.id !== alphaId)
+      };
+      setUser(updatedUser);
 
-    showNotification('Alpha deleted successfully.', 'success', 3000);
-    return true;
+      showNotification('Alpha deleted successfully.', 'success', 3000);
+      return true;
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Failed to delete alpha';
+      showNotification(errorMessage, 'error', 5000);
+      return false;
+    }
   };
 
-  const updateAlpha = (alphaId, updatedData) => {
+  const updateAlpha = async (alphaId, updatedData) => {
     if (isGuest || !user) {
       return false;
     }
 
-    const updatedUser = {
-      ...user,
-      alphas: user.alphas.map(alpha =>
-        alpha.id === alphaId
-          ? { ...alpha, ...updatedData, updatedAt: new Date().toISOString() }
-          : alpha
-      ),
-    };
+    try {
+      await axios.put(`/api/alphas/${alphaId}/update/`, updatedData, {
+        withCredentials: true
+      });
 
-    setUser(updatedUser);
-    saveAuthState(updatedUser);
+      // Update user state
+      const updatedUser = {
+        ...user,
+        alphas: user.alphas.map(alpha =>
+          alpha.id === alphaId
+            ? { ...alpha, ...updatedData, updated_at: new Date().toISOString() }
+            : alpha
+        )
+      };
+      setUser(updatedUser);
 
-    showNotification('Alpha updated successfully.', 'success', 3000);
-    return true;
+      showNotification('Alpha updated successfully.', 'success', 3000);
+      return true;
+    } catch (error) {
+      const errorMessage = error.response?.data?.error || 'Failed to update alpha';
+      showNotification(errorMessage, 'error', 5000);
+      return false;
+    }
   };
 
   const value = {
     user,
     isGuest,
+    loading,
     isLoginModalOpen,
     login,
     register,

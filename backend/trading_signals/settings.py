@@ -90,3 +90,10 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# MongoDB Configuration
+MONGODB_SETTINGS = {
+    'db': 'alpha_quest',
+    'host': 'mongodb+srv://jacky:Anotherdayofsun142@cluster0.94baind.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+    'alias': 'default'
+}
