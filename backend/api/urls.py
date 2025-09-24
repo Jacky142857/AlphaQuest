@@ -1,8 +1,31 @@
 # backend/api/urls.py
 from django.urls import path
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 from . import views, auth_views
 
+# API root view
+@require_http_methods(["GET"])
+def api_root(request):
+    return JsonResponse({
+        'message': 'AlphaQuest API v1.0',
+        'endpoints': {
+            'data': {
+                'load_dow30': '/api/load-dow30/ (POST)',
+                'upload_data': '/api/upload-data/ (POST)',
+                'upload_multiple': '/api/upload-multiple-data/ (POST)',
+                'calculate_alpha': '/api/calculate-alpha/ (POST)',
+            },
+            'auth': {
+                'register': '/api/auth/register/ (POST)',
+                'login': '/api/auth/login/ (POST)',
+                'user': '/api/auth/user/ (GET)',
+            }
+        }
+    })
+
 urlpatterns = [
+    path('', api_root, name='api_root'),
     # Data management endpoints
     path('upload-data/', views.upload_data, name='upload_data'),
     path('upload-multiple-data/', views.upload_multiple_data, name='upload_multiple_data'),
