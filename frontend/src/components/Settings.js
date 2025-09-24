@@ -9,15 +9,7 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
     neutralization: false,
     decay: 0,
     truncation: 0.08,
-    pasteurization: 'On',
-    nanHandling: 'Off',
-    maxTrade: 'Off',
-    delay: 1,
-    commission: 0.001,
-    bookSize: 1000000,
-    minWeight: 0.01,
-    maxWeight: 0.05,
-    rebalanceFreq: 'Daily'
+    delay: 1
   });
 
   // Handle escape key to close modal
@@ -120,7 +112,9 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
               <span className="slider-value">{settings.decay}</span>
             </div>
           </div>
+        </div>
 
+        <div className="settings-row">
           <div className="setting-group">
             <label className="setting-label">
               TRUNCATION ⓘ
@@ -138,53 +132,7 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
               <span className="slider-value">{(settings.truncation * 100).toFixed(0)}%</span>
             </div>
           </div>
-        </div>
 
-        <div className="settings-row">
-          <div className="setting-group">
-            <label className="setting-label">
-              PASTEURIZATION ⓘ
-            </label>
-            <select
-              className="setting-select"
-              value={settings.pasteurization}
-              onChange={(e) => handleSettingChange('pasteurization', e.target.value)}
-            >
-              <option value="On">On</option>
-              <option value="Off">Off</option>
-            </select>
-          </div>
-
-          <div className="setting-group">
-            <label className="setting-label">
-              NAN HANDLING ⓘ
-            </label>
-            <select
-              className="setting-select"
-              value={settings.nanHandling}
-              onChange={(e) => handleSettingChange('nanHandling', e.target.value)}
-            >
-              <option value="Off">Off</option>
-              <option value="On">On</option>
-            </select>
-          </div>
-
-          <div className="setting-group">
-            <label className="setting-label">
-              MAX TRADE ⓘ
-            </label>
-            <select
-              className="setting-select"
-              value={settings.maxTrade}
-              onChange={(e) => handleSettingChange('maxTrade', e.target.value)}
-            >
-              <option value="Off">Off</option>
-              <option value="On">On</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="settings-row">
           <div className="setting-group">
             <label className="setting-label">
               DELAY (DAYS) ⓘ
@@ -199,96 +147,6 @@ const Settings = ({ onSettingsChange, isOpen, onToggle }) => {
                 className="slider"
               />
               <span className="slider-value">{settings.delay}</span>
-            </div>
-          </div>
-
-          <div className="setting-group">
-            <label className="setting-label">
-              COMMISSION (%) ⓘ
-            </label>
-            <div className="setting-slider">
-              <input
-                type="range"
-                min="0"
-                max="0.01"
-                step="0.0001"
-                value={settings.commission}
-                onChange={(e) => handleSettingChange('commission', parseFloat(e.target.value))}
-                className="slider"
-              />
-              <span className="slider-value">{(settings.commission * 100).toFixed(2)}%</span>
-            </div>
-          </div>
-
-          <div className="setting-group">
-            <label className="setting-label">
-              REBALANCE FREQ ⓘ
-            </label>
-            <select
-              className="setting-select"
-              value={settings.rebalanceFreq}
-              onChange={(e) => handleSettingChange('rebalanceFreq', e.target.value)}
-            >
-              <option value="Daily">Daily</option>
-              <option value="Weekly">Weekly</option>
-              <option value="Monthly">Monthly</option>
-              <option value="Quarterly">Quarterly</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="settings-row">
-          <div className="setting-group">
-            <label className="setting-label">
-              BOOK SIZE ($) ⓘ
-            </label>
-            <div className="setting-slider">
-              <input
-                type="range"
-                min="100000"
-                max="10000000"
-                step="100000"
-                value={settings.bookSize}
-                onChange={(e) => handleSettingChange('bookSize', parseInt(e.target.value))}
-                className="slider"
-              />
-              <span className="slider-value">${(settings.bookSize / 1000000).toFixed(1)}M</span>
-            </div>
-          </div>
-
-          <div className="setting-group">
-            <label className="setting-label">
-              MIN WEIGHT (%) ⓘ
-            </label>
-            <div className="setting-slider">
-              <input
-                type="range"
-                min="0.001"
-                max="0.1"
-                step="0.001"
-                value={settings.minWeight}
-                onChange={(e) => handleSettingChange('minWeight', parseFloat(e.target.value))}
-                className="slider"
-              />
-              <span className="slider-value">{(settings.minWeight * 100).toFixed(1)}%</span>
-            </div>
-          </div>
-
-          <div className="setting-group">
-            <label className="setting-label">
-              MAX WEIGHT (%) ⓘ
-            </label>
-            <div className="setting-slider">
-              <input
-                type="range"
-                min="0.01"
-                max="0.2"
-                step="0.01"
-                value={settings.maxWeight}
-                onChange={(e) => handleSettingChange('maxWeight', parseFloat(e.target.value))}
-                className="slider"
-              />
-              <span className="slider-value">{(settings.maxWeight * 100).toFixed(0)}%</span>
             </div>
           </div>
         </div>
