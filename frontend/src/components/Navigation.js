@@ -28,7 +28,7 @@ const Navigation = () => {
     <nav className="main-navigation">
       <div className="nav-brand">
         <Link to="/simulate">
-          <h1>Trading Signals Alpha Strategy</h1>
+          <h1>AlphaQuest</h1>
         </Link>
       </div>
 
