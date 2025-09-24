@@ -199,9 +199,75 @@
 
 /* Alpha List */
 .alphas-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+}
+
+.alpha-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #e9ecef;
+  transition: background-color 0.2s ease;
+}
+
+.alpha-list-item:last-child {
+  border-bottom: none;
+}
+
+.alpha-list-item:hover {
+  background-color: #f8f9fa;
+}
+
+.alpha-info {
+  display: flex;
+  align-items: center;
   gap: 20px;
+  flex: 1;
+}
+
+.alpha-name {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+  min-width: 120px;
+}
+
+.alpha-formula {
+  flex: 1;
+  min-width: 0;
+}
+
+.alpha-formula code {
+  font-family: 'SF Mono', Monaco, monospace;
+  font-size: 13px;
+  color: #666;
+  background: #f8f9fa;
+  padding: 4px 8px;
+  border-radius: 4px;
+  display: inline-block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.alpha-return {
+  font-weight: 600;
+  font-size: 16px;
+  min-width: 80px;
+  text-align: right;
+}
+
+.alpha-return.positive {
+  color: #10b981;
+}
+
+.alpha-return.negative {
+  color: #ef4444;
 }
 
 /* Alpha Cards */
@@ -477,10 +543,28 @@
 .dark-theme .alphas-guest-state,
 .dark-theme .alphas-empty-state,
 .dark-theme .alpha-card,
-.dark-theme .alpha-details {
+.dark-theme .alpha-details,
+.dark-theme .alphas-list {
   background: #2b2d42;
   border-color: #404258;
   color: white;
+}
+
+.dark-theme .alpha-list-item {
+  border-bottom-color: #404258;
+}
+
+.dark-theme .alpha-list-item:hover {
+  background-color: #404258;
+}
+
+.dark-theme .alpha-name {
+  color: white;
+}
+
+.dark-theme .alpha-formula code {
+  background: #404258;
+  color: #e5e7eb;
 }
 
 .dark-theme .alphas-guest-state h2,

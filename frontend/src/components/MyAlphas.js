@@ -5,7 +5,6 @@ import './MyAlphas.css';
 
 const MyAlphas = () => {
   const { user, isGuest, openLoginModal, deleteAlpha } = useAuth();
-  const [selectedAlpha, setSelectedAlpha] = useState(null);
   const [sortBy, setSortBy] = useState('newest');
 
   if (isGuest) {
@@ -55,9 +54,6 @@ const MyAlphas = () => {
   const handleDeleteAlpha = (alphaId, alphaName) => {
     if (window.confirm(`Are you sure you want to delete "${alphaName}"? This action cannot be undone.`)) {
       deleteAlpha(alphaId);
-      if (selectedAlpha?.id === alphaId) {
-        setSelectedAlpha(null);
-      }
     }
   };
 
@@ -122,176 +118,30 @@ const MyAlphas = () => {
         </div>
       </div>
 
-      <div className="alphas-layout">
-        <div className="alphas-list">
-          {sortedAlphas.map((alpha) => (
-            <div
-              key={alpha.id}
-              className={`alpha-card ${selectedAlpha?.id === alpha.id ? 'selected' : ''}`}
-              onClick={() => setSelectedAlpha(alpha)}
+      <div className="alphas-list">
+        {sortedAlphas.map((alpha) => (
+          <div key={alpha.id} className="alpha-list-item">
+            <div className="alpha-info">
+              <span className="alpha-name">{alpha.name}</span>
+              <span className="alpha-formula"><code>{alpha.formula}</code></span>
+              <span className={`alpha-return ${
+                (alpha.returns?.totalReturn || 0) > 0 ? 'positive' : 'negative'
+              }`}>
+                {formatReturn(alpha.returns?.totalReturn)}
+              </span>
+            </div>
+            <button
+              className="delete-btn"
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteAlpha(alpha.id, alpha.name);
+              }}
+              title="Delete Alpha"
             >
-              <div className="card-header">
-                <h3>{alpha.name}</h3>
-                <div className="card-actions">
-                  <button
-                    className="delete-btn"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteAlpha(alpha.id, alpha.name);
-                    }}
-                    title="Delete Alpha"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-
-              <div className="card-formula">
-                <code>{alpha.formula}</code>
-              </div>
-
-              <div className="card-metrics">
-                <div className="metric">
-                  <span className="metric-label">Total Return</span>
-                  <span className={`metric-value ${
-                    (alpha.returns?.totalReturn || 0) > 0 ? 'positive' : 'negative'
-                  }`}>
-                    {formatReturn(alpha.returns?.totalReturn)}
-                  </span>
-                </div>
-                <div className="metric">
-                  <span className="metric-label">Sharpe Ratio</span>
-                  <span className="metric-value">
-                    {alpha.metrics?.sharpeRatio?.toFixed(3) || 'N/A'}
-                  </span>
-                </div>
-              </div>
-
-              <div className="card-info">
-                <div className="info-item">
-                  <span className="info-label">Data Source:</span>
-                  <span className="info-value">{alpha.dataSource?.type || 'Unknown'}</span>
-                </div>
-                <div className="info-item">
-                  <span className="info-label">Created:</span>
-                  <span className="info-value">{formatDate(alpha.createdAt)}</span>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {selectedAlpha && (
-          <div className="alpha-details">
-            <div className="details-header">
-              <h3>{selectedAlpha.name}</h3>
-              <button
-                className="close-details-btn"
-                onClick={() => setSelectedAlpha(null)}
-              >
-                ×
-              </button>
-            </div>
-
-            <div className="details-content">
-              <div className="details-section">
-                <h4>Alpha Formula</h4>
-                <div className="formula-display">
-                  <code>{selectedAlpha.formula}</code>
-                </div>
-              </div>
-
-              <div className="details-section">
-                <h4>Performance Metrics</h4>
-                <div className="metrics-grid">
-                  <div className="metric-item">
-                    <span className="metric-name">Total Return</span>
-                    <span className={`metric-result ${
-                      (selectedAlpha.returns?.totalReturn || 0) > 0 ? 'positive' : 'negative'
-                    }`}>
-                      {formatReturn(selectedAlpha.returns?.totalReturn)}
-                    </span>
-                  </div>
-                  <div className="metric-item">
-                    <span className="metric-name">Annualized Return</span>
-                    <span className="metric-result">
-                      {formatReturn(selectedAlpha.returns?.annualizedReturn)}
-                    </span>
-                  </div>
-                  <div className="metric-item">
-                    <span className="metric-name">Volatility</span>
-                    <span className="metric-result">
-                      {formatReturn(selectedAlpha.returns?.volatility)}
-                    </span>
-                  </div>
-                  <div className="metric-item">
-                    <span className="metric-name">Sharpe Ratio</span>
-                    <span className="metric-result">
-                      {selectedAlpha.metrics?.sharpeRatio?.toFixed(3) || 'N/A'}
-                    </span>
-                  </div>
-                  <div className="metric-item">
-                    <span className="metric-name">Max Drawdown</span>
-                    <span className="metric-result negative">
-                      {formatReturn(selectedAlpha.metrics?.maxDrawdown)}
-                    </span>
-                  </div>
-                  <div className="metric-item">
-                    <span className="metric-name">Win Rate</span>
-                    <span className="metric-result">
-                      {selectedAlpha.metrics?.winRate ? `${(selectedAlpha.metrics.winRate * 100).toFixed(1)}%` : 'N/A'}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="details-section">
-                <h4>Strategy Configuration</h4>
-                <div className="config-grid">
-                  <div className="config-item">
-                    <span className="config-label">Data Source</span>
-                    <span className="config-value">
-                      {selectedAlpha.dataSource?.type || 'Unknown'}
-                      {selectedAlpha.dataSource?.tickers &&
-                        ` (${selectedAlpha.dataSource.tickers.join(', ')})`
-                      }
-                    </span>
-                  </div>
-                  <div className="config-item">
-                    <span className="config-label">Date Range</span>
-                    <span className="config-value">
-                      {selectedAlpha.dateRange?.start} to {selectedAlpha.dateRange?.end}
-                    </span>
-                  </div>
-                  <div className="config-item">
-                    <span className="config-label">Neutralization</span>
-                    <span className="config-value">
-                      {selectedAlpha.settings?.neutralization ? 'On' : 'Off'}
-                    </span>
-                  </div>
-                  <div className="config-item">
-                    <span className="config-label">Decay</span>
-                    <span className="config-value">{selectedAlpha.settings?.decay || 0}</span>
-                  </div>
-                </div>
-              </div>
-
-              <div className="details-section">
-                <h4>Timestamps</h4>
-                <div className="timestamp-grid">
-                  <div className="timestamp-item">
-                    <span className="timestamp-label">Created</span>
-                    <span className="timestamp-value">{formatDate(selectedAlpha.createdAt)}</span>
-                  </div>
-                  <div className="timestamp-item">
-                    <span className="timestamp-label">Last Updated</span>
-                    <span className="timestamp-value">{formatDate(selectedAlpha.updatedAt)}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+              🗑️
+            </button>
           </div>
-        )}
+        ))}
       </div>
     </div>
   );
