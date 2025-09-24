@@ -99,6 +99,31 @@
   transform: scale(1.05);
 }
 
+/* Auth Button */
+.auth-btn {
+  background: none;
+  border: 2px solid #4a90e2;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #4a90e2;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+.auth-btn:hover {
+  background: #4a90e2;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+}
+
 /* Dark theme styles for navigation */
 .dark-theme .main-navigation {
   background: #1a1c2e;
@@ -133,6 +158,16 @@
   background: #2b2d42;
 }
 
+.dark-theme .auth-btn {
+  border-color: #87ceeb;
+  color: #87ceeb;
+}
+
+.dark-theme .auth-btn:hover {
+  background: #87ceeb;
+  color: #1a1c2e;
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   .main-navigation {
@@ -165,5 +200,11 @@
   .theme-toggle-btn {
     margin-left: 0;
     margin-top: 10px;
+  }
+
+  .auth-btn {
+    margin-left: 0;
+    margin-top: 10px;
+    font-size: 0.8rem;
   }
 }

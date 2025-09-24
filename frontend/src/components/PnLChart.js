@@ -4,7 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import ChartEmptyState from './ChartEmptyState';
 import './ChartEmptyState.css';
 
-const PnLChart = ({ data, metrics, loading, isDataUploaded, hasFormula }) => {
+const PnLChart = ({ data, metrics, loading, isDataUploaded, hasFormula, onSaveAlpha }) => {
   const [selectedMetric, setSelectedMetric] = useState('pnl');
 
   // Available metrics for display
@@ -87,10 +87,6 @@ const PnLChart = ({ data, metrics, loading, isDataUploaded, hasFormula }) => {
         }
       };
 
-      const getColor = (val, metric) => {
-        if (metric === 'drawdown') return '#dc3545';
-        return val >= 0 ? '#28a745' : '#dc3545';
-      };
 
       return (
         <div style={{
@@ -156,14 +152,46 @@ const PnLChart = ({ data, metrics, loading, isDataUploaded, hasFormula }) => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h2 style={{ margin: 0 }}>{currentMetric?.icon} {currentMetric?.label} Chart</h2>
 
-        <div style={{
-          display: 'flex',
-          gap: '8px',
-          background: '#f8f9fa',
-          padding: '4px',
-          borderRadius: '8px',
-          border: '1px solid #e0e0e0'
-        }}>
+        <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+          {onSaveAlpha && data && (
+            <button
+              onClick={onSaveAlpha}
+              style={{
+                background: 'linear-gradient(135deg, #4a90e2 0%, #357abd 100%)',
+                color: 'white',
+                border: 'none',
+                padding: '10px 16px',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                fontSize: '14px',
+                fontWeight: '600',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                boxShadow: '0 2px 8px rgba(74, 144, 226, 0.3)',
+                transition: 'all 0.2s ease'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-1px)';
+                e.target.style.boxShadow = '0 4px 12px rgba(74, 144, 226, 0.4)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 2px 8px rgba(74, 144, 226, 0.3)';
+              }}
+            >
+              💾 Save Alpha
+            </button>
+          )}
+
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            background: '#f8f9fa',
+            padding: '4px',
+            borderRadius: '8px',
+            border: '1px solid #e0e0e0'
+          }}>
           {availableMetrics.map((metric) => (
             <button
               key={metric.key}
@@ -187,6 +215,7 @@ const PnLChart = ({ data, metrics, loading, isDataUploaded, hasFormula }) => {
               <span>{metric.label}</span>
             </button>
           ))}
+          </div>
         </div>
       </div>
 

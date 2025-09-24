@@ -4,8 +4,10 @@ import AlphaFormula from './AlphaFormula';
 import PnLChart from './PnLChart';
 import DataUpload from './DataUpload';
 import Settings from './Settings';
+import { useAuth } from '../contexts/AuthContext';
 
 function Simulate() {
+  const { saveAlpha } = useAuth();
   const [pnlData, setPnlData] = useState(null);
   const [metrics, setMetrics] = useState(null);
   const [isDataUploaded, setIsDataUploaded] = useState(false);
@@ -13,6 +15,7 @@ function Simulate() {
   const [loading, setLoading] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [dataUploadOpen, setDataUploadOpen] = useState(false);
+  const [currentAlphaData, setCurrentAlphaData] = useState(null);
   const [strategySettings, setStrategySettings] = useState({
     neutralization: false,
     decay: 4,
@@ -37,6 +40,32 @@ function Simulate() {
   const handleAlphaResult = (result) => {
     setPnlData(result.pnl_data);
     setMetrics(result.metrics);
+
+    // Store current alpha data for potential saving
+    setCurrentAlphaData({
+      formula: result.formula,
+      settings: strategySettings,
+      dataSource: result.dataSource,
+      dateRange: result.dateRange,
+      returns: result.returns,
+      metrics: result.metrics
+    });
+  };
+
+  const handleSaveAlpha = () => {
+    if (!currentAlphaData) {
+      return;
+    }
+
+    const alphaName = prompt('Enter a name for this alpha strategy:');
+    if (alphaName && alphaName.trim()) {
+      const alphaToSave = {
+        ...currentAlphaData,
+        name: alphaName.trim()
+      };
+
+      saveAlpha(alphaToSave);
+    }
   };
 
   const handleSettingsChange = (newSettings) => {
@@ -83,6 +112,7 @@ function Simulate() {
             loading={loading}
             isDataUploaded={isDataUploaded}
             hasFormula={hasFormula}
+            onSaveAlpha={handleSaveAlpha}
           />
         </div>
       </div>
