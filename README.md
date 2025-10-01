@@ -5,7 +5,7 @@ AlphaQuest is a comprehensive alpha factor research and backtesting platform tha
 ## 🚀 Live Demo
 
 **Try AlphaQuest now:** [https://alpha-quest.vercel.app/simulate](https://alpha-quest.vercel.app/simulate)
-
+Since this is a free deployment, the backend server may take one to two minutes to start due to a cold start.
 ## Features
 
 ### 🧮 Mathematical Operators
